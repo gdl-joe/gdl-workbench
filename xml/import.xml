@@ -1,0 +1,998 @@
+<ParamSection SectVersion="27" SectionFlags="0" SubIdent="0">
+	<ParamSectHeader>
+		<AutoHotspots>false</AutoHotspots>
+		<StatBits>
+			<STBit_UIDefault/>
+			<STBit_FixSize/>
+			<STBit_UIUseHierarchicalPages/>
+		</StatBits>
+		<WDLeftFrame>0</WDLeftFrame>
+		<WDRightFrame>0</WDRightFrame>
+		<WDTopFrame>0</WDTopFrame>
+		<WDBotFrame>0</WDBotFrame>
+		<LayFlags>65535</LayFlags>
+		<WDMirrorThickness>0</WDMirrorThickness>
+		<WDWallInset>0</WDWallInset>
+	</ParamSectHeader>
+	<Parameters>
+		<Boolean Name="AC_show2DHotspotsIn3D">
+			<Description><![CDATA["2D-Fixpunkte in 3D zeigen"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Length Name="ac_bottomlevel">
+			<Description><![CDATA["Untere Ebene"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Length Name="ac_toplevel">
+			<Description><![CDATA["Obere Ebene"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Integer Name="gs_ui_current_page">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- Konus_Pyra_C: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="Konus_Pyra_C">
+			<Description><![CDATA["A L L G E M E I N"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Length Name="A">
+			<Description><![CDATA["Innendurchmesser Schacht"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1.5</Value>
+		</Length>
+		<Length Name="B">
+			<Description><![CDATA["Innendurchmesser Konus"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.65</Value>
+		</Length>
+		<Length Name="ZZYZX">
+			<Description><![CDATA["Schachthöhe gesamt"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>3.1515</Value>
+		</Length>
+		<BuildingMaterial Name="bm_beton">
+			<Description><![CDATA["Baustoff Beton"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>131</Value>
+		</BuildingMaterial>
+		<Length Name="wand">
+			<Description><![CDATA["Wandstärke"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.06</Value>
+		</Length>
+		<Integer Name="int_aufbau">
+			<Description><![CDATA["Aufbau"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- Konus_Pyra_B: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="Konus_Pyra_B">
+			<Description><![CDATA["K O N U S"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Angle Name="ang_konus">
+			<Description><![CDATA["Dreehung Konus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Angle>
+		<Length Name="konus">
+			<Description><![CDATA["Höhe Konus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.6</Value>
+		</Length>
+		<Boolean Name="ausmittig">
+			<Description><![CDATA["Konus ausmittig"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Length Name="z_deckelrand">
+			<Description><![CDATA["Höhe Deckelrand"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.1</Value>
+		</Length>
+		<Length Name="deckel">
+			<Description><![CDATA["Höhe Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.04</Value>
+		</Length>
+		<BuildingMaterial Name="bm_deckel">
+			<Description><![CDATA["Baustoff Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>120</Value>
+		</BuildingMaterial>
+		<Integer Name="int_anz_ausgleich">
+			<Description><![CDATA["Anzahl Ausgleichsringe"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>3</Value>
+		</Integer>
+		<Integer Name="int_z_ausgleich">
+			<Description><![CDATA["Höhe der Ausgleichsringe in mm"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<ArrayValues FirstDimension="3" SecondDimension="0">
+				<AVal Row="1">40</AVal>
+				<AVal Row="2">100</AVal>
+				<AVal Row="3">100</AVal>
+			</ArrayValues>
+		</Integer>
+		<Length Name="z_ausgleich">
+			<Description><![CDATA["Höhe der Ausgleichsringe"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<ArrayValues FirstDimension="3" SecondDimension="0">
+				<AVal Row="1">0.04</AVal>
+				<AVal Row="2">0.1</AVal>
+				<AVal Row="3">0.1</AVal>
+			</ArrayValues>
+		</Length>
+		<RealNum Name="T_target_pcnt">
+			<Description><![CDATA["Gewünschte Neigung der Ringe (%)"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>5</Value>
+		</RealNum>
+		<Boolean Name="b_ausgleich_gefaelle">
+			<Description><![CDATA["Ringe mit Gefälle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Angle Name="ang_drehung_neigung">
+			<Description><![CDATA["Drehung der Neigung um Z-Achse"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>45</Value>
+		</Angle>
+
+		<!-- Konus_Pyra_A: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="Konus_Pyra_A">
+			<Description><![CDATA["B O D E N"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Boolean Name="b_show_gerinne_2D">
+			<Description><![CDATA["Gerinne 2"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_boden">
+			<Description><![CDATA["Boden an /aus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Length Name="z_boden">
+			<Description><![CDATA["Höhe Bodenring"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.5</Value>
+		</Length>
+		<Length Name="z_bodenplatte">
+			<Description><![CDATA["Höhe Bodenplatte"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.3</Value>
+		</Length>
+		<BuildingMaterial Name="bm_boden">
+			<Description><![CDATA["Baustof Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>111</Value>
+		</BuildingMaterial>
+		<Angle Name="ang_fluss">
+			<Description><![CDATA["Flussrichtung"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Angle>
+		<Length Name="gerinne">
+			<Description><![CDATA["Durchmesser Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.1</Value>
+		</Length>
+		<Length Name="rad_rohr_gerinne">
+			<Description><![CDATA["Radius Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.05</Value>
+		</Length>
+		<Boolean Name="b_gerinne">
+			<Description><![CDATA["Gerinne an/aus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_gerinne_2d">
+			<Description><![CDATA["in 2D-Projektion"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Integer Name="int_typ_gerinne">
+			<Description><![CDATA["Gerinne-Art"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<RealNum Name="real_gefaelle">
+			<Description><![CDATA["Gefälle Gerinn in %"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1.5</Value>
+		</RealNum>
+		<Length Name="z_gefaelle">
+			<Description><![CDATA["Gesamtgefälle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.02</Value>
+		</Length>
+		<Length Name="uk_gerinne">
+			<Description><![CDATA["Untzerrkante Gerinne Eintritt"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>-2.9015</Value>
+		</Length>
+		<Length Name="uk_gerinne_aus">
+			<Description><![CDATA["Unterkante Gerinne Austritt"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>-2.9215</Value>
+		</Length>
+		<Length Name="uk_sohle">
+			<Description><![CDATA["Unterkante Schachtsohle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>3.1515</Value>
+		</Length>
+		<Length Name="ok_sohle">
+			<Description><![CDATA["Oberkante Schachtsohle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Length Name="ok_deckel">
+			<Description><![CDATA["Oberkante Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Length Name="rad_gerinne">
+			<Description><![CDATA["Radius Gerinnebogen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.25</Value>
+		</Length>
+
+		<!-- Konus_Pyra_D: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="Konus_Pyra_D">
+			<Description><![CDATA["K Ö R P E R"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Length Name="z_ring">
+			<Description><![CDATA["Ringhöhe"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.5</Value>
+		</Length>
+		<Length Name="z_ring_manuell">
+			<Description><![CDATA["Ringhöhe manuell"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<ArrayValues FirstDimension="20" SecondDimension="0">
+				<AVal Row="1">0.5</AVal>
+				<AVal Row="2">0.5</AVal>
+				<AVal Row="3">0.5</AVal>
+				<AVal Row="4">0.25</AVal>
+				<AVal Row="5">0.25</AVal>
+				<AVal Row="6">0.25</AVal>
+				<AVal Row="7">0.25</AVal>
+				<AVal Row="8">0.25</AVal>
+				<AVal Row="9">0.25</AVal>
+				<AVal Row="10">0.25</AVal>
+				<AVal Row="11">0.25</AVal>
+				<AVal Row="12">0.25</AVal>
+				<AVal Row="13">0.25</AVal>
+				<AVal Row="14">0.25</AVal>
+				<AVal Row="15">0.25</AVal>
+				<AVal Row="16">0.25</AVal>
+				<AVal Row="17">0.25</AVal>
+				<AVal Row="18">0.25</AVal>
+				<AVal Row="19">0.25</AVal>
+				<AVal Row="20">0.25</AVal>
+			</ArrayValues>
+		</Length>
+		<Integer Name="int_anz_ringe_manuell">
+			<Description><![CDATA["Anzahl Ringe manuell"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>4</Value>
+		</Integer>
+
+		<!-- bprismakan_B: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="bprismakan_B">
+			<Description><![CDATA["2 D   A L L G E M E I N"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Boolean Name="b_geschoss_abhaengig">
+			<Description><![CDATA["Geschossabhängikeit"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Integer Name="int_einsetzgeschoss">
+			<Description><![CDATA["Einsetzgeschoss"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="int_anzeigetyp">
+			<Description><![CDATA["Anzeigetyp"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+
+		<!-- bprismakan_E: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="bprismakan_E">
+			<Description><![CDATA["2 D   A U F S I C H T"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Boolean Name="b_kreis_deckel_o">
+			<Description><![CDATA["oberhalb: Kreis Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_kreis_deckelrand_o">
+			<Description><![CDATA["oberhalb: Kreis Deckelrand"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_kreis_aussen_o">
+			<Description><![CDATA["oberhalb: Kreis Schachtaußenkante"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_fill_deckel_o">
+			<Description><![CDATA["oberhalb: Schraffur Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_fill_aussen_o">
+			<Description><![CDATA["oberhalb: Schraffur Schachtaussenkante"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<LineType Name="lt_deckel_o">
+			<Description><![CDATA["Linientyp Deckelkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</LineType>
+		<LineType Name="lt_aussen_o">
+			<Description><![CDATA["Liniengtyp Außenkante"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>49</Value>
+		</LineType>
+		<PenColor Name="pen_deckel_o">
+			<Description><![CDATA["Konturstift Deckel oben"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</PenColor>
+		<PenColor Name="pen_aussen_o">
+			<Description><![CDATA["Konturstift Außenkante"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>244</Value>
+		</PenColor>
+		<FillPattern Name="fill_deckel_o">
+			<Description><![CDATA["Schraffur Deckelkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>24</Value>
+		</FillPattern>
+		<FillPattern Name="fill_aussen_o">
+			<Description><![CDATA["Schraffur Außenkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>24</Value>
+		</FillPattern>
+		<PenColor Name="pen_vg_deckel_o">
+			<Description><![CDATA["Vordergrundstift Deckelkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>155</Value>
+		</PenColor>
+		<PenColor Name="pen_vg_aussen_o">
+			<Description><![CDATA["Vordergrundstift Außenkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>25</Value>
+		</PenColor>
+		<PenColor Name="pen_hg_deckel_o">
+			<Description><![CDATA["Hintegrundstift Deckelkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</PenColor>
+		<PenColor Name="pen_hg_aussen_o">
+			<Description><![CDATA["Hintegrundstift Außenkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</PenColor>
+		<Boolean Name="b_achse_gerinne">
+			<Description><![CDATA["Achse Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<PenColor Name="pen_achse_gerinne">
+			<Description><![CDATA["Achse Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>136</Value>
+		</PenColor>
+		<LineType Name="lt_achse_gerinne">
+			<Description><![CDATA["Achse Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>49</Value>
+		</LineType>
+
+		<!-- bprismakan_F: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="bprismakan_F">
+			<Description><![CDATA["2 D   S C H N I T T   U N T E N"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Boolean Name="b_kreis_deckel_u">
+			<Description><![CDATA["unterhalb: Kreis Deckel Konus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<LineType Name="lt_konus_u">
+			<Description><![CDATA["Linientyp Konus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>47</Value>
+		</LineType>
+		<PenColor Name="pen_konus_u">
+			<Description><![CDATA["Stift Konus"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>22</Value>
+		</PenColor>
+		<Boolean Name="b_kreis_aussen_u">
+			<Description><![CDATA["unterhalb: Außenkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="b_kreis_innen_u">
+			<Description><![CDATA["unterhalb: Innenkreis"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="b_fill_wand_u">
+			<Description><![CDATA["unterhalb: Schachtwandschraffur"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="b_linie_gerinne">
+			<Description><![CDATA["unterhalb: Gerinne als Linien"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="b_fill_gerinne">
+			<Description><![CDATA["unterhalb: Gerinne als Schraffur"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<LineType Name="lt_wand_u">
+			<Description><![CDATA["Linientyp Kontur Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</LineType>
+		<LineType Name="lt_gerinne">
+			<Description><![CDATA["Linientyp Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</LineType>
+		<PenColor Name="pen_wand_u">
+			<Description><![CDATA["Konturstift Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</PenColor>
+		<PenColor Name="pen_gerinne">
+			<Description><![CDATA["Konturstift Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</PenColor>
+		<FillPattern Name="fill_wand_u">
+			<Description><![CDATA["Schraffur Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>23</Value>
+		</FillPattern>
+		<FillPattern Name="fill_gerinne">
+			<Description><![CDATA["Schraffur Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>24</Value>
+		</FillPattern>
+		<PenColor Name="pen_vg_wand_u">
+			<Description><![CDATA["Vordergrundstift Schraffur"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</PenColor>
+		<PenColor Name="pen_vg_gerinne">
+			<Description><![CDATA["VG-Stift Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>21</Value>
+		</PenColor>
+		<PenColor Name="pen_hg_wand_u">
+			<Description><![CDATA["Hintergrundstift Schraffur"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</PenColor>
+		<PenColor Name="pen_hg_gerinne">
+			<Description><![CDATA["HG-Stift Gerinne"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</PenColor>
+
+		<!-- bprismakan_A: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="bprismakan_A">
+			<Description><![CDATA["E I G E N S C H A F T E N   P A R A M E T E R"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<String Name="str_typ_gerinne">
+			<Description><![CDATA["Gertinnetyp"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["gerade"]]></Value>
+		</String>
+		<Integer Name="int_typ_deckel">
+			<Description><![CDATA["Typ Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="str_typ_deckel">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["geschlossen"]]></Value>
+		</String>
+		<Integer Name="int_werkstoff_deckel">
+			<Description><![CDATA["Werkstoff Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="str_werkstoff_deckel">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["BEGU"]]></Value>
+		</String>
+		<Integer Name="int_belastungsklasse">
+			<Description><![CDATA["Belastungsklasse Deckel"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="str_belastungsklasse">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["A15"]]></Value>
+		</String>
+		<Integer Name="int_einsatzbereich">
+			<Description><![CDATA["Einsatzbereich Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="str_einsatzbereich">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Regenwasser"]]></Value>
+		</String>
+		<Integer Name="int_werkstoff_schacht">
+			<Description><![CDATA["Werkstoff Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="str_werkstoff_schacht">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Beton"]]></Value>
+		</String>
+		<Length Name="int_funktion_schacht">
+			<Description><![CDATA["Funktion Schacht"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<String Name="str_funktion_schacht">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Abwasserschacht"]]></Value>
+		</String>
+
+		<!-- bprismasch_A: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="bprismasch_A">
+			<Description><![CDATA["M E P"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<Boolean Name="useSysMat">
+			<Description><![CDATA["System-Material anwenden"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Material Name="sMat">
+			<Description><![CDATA["Material System"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>80</Value>
+		</Material>
+		<Boolean Name="SetProgram">
+			<Description><![CDATA["Programm einstellen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Integer Name="ui_current_con">
+			<Description><![CDATA["Aktueller Anschluss auf dem UI"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="MEP_NumberConnections">
+			<Description><![CDATA["Anzahl Anschlüsse"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<Length Name="gs_Connections">
+			<Description><![CDATA["Anschluss Daten"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<ArrayValues FirstDimension="2" SecondDimension="26">
+				<AVal Column="1" Row="1">0</AVal>
+				<AVal Column="2" Row="1">0</AVal>
+				<AVal Column="3" Row="1">0</AVal>
+				<AVal Column="4" Row="1">0</AVal>
+				<AVal Column="5" Row="1">0</AVal>
+				<AVal Column="6" Row="1">0</AVal>
+				<AVal Column="7" Row="1">0</AVal>
+				<AVal Column="8" Row="1">0</AVal>
+				<AVal Column="9" Row="1">0</AVal>
+				<AVal Column="10" Row="1">0</AVal>
+				<AVal Column="11" Row="1">0</AVal>
+				<AVal Column="12" Row="1">0</AVal>
+				<AVal Column="13" Row="1">0</AVal>
+				<AVal Column="14" Row="1">0</AVal>
+				<AVal Column="15" Row="1">0</AVal>
+				<AVal Column="16" Row="1">0</AVal>
+				<AVal Column="17" Row="1">0</AVal>
+				<AVal Column="18" Row="1">0</AVal>
+				<AVal Column="19" Row="1">0</AVal>
+				<AVal Column="20" Row="1">0</AVal>
+				<AVal Column="21" Row="1">0</AVal>
+				<AVal Column="22" Row="1">0</AVal>
+				<AVal Column="23" Row="1">0</AVal>
+				<AVal Column="24" Row="1">0</AVal>
+				<AVal Column="25" Row="1">0</AVal>
+				<AVal Column="26" Row="1">0</AVal>
+				<AVal Column="1" Row="2">0</AVal>
+				<AVal Column="2" Row="2">0</AVal>
+				<AVal Column="3" Row="2">0</AVal>
+				<AVal Column="4" Row="2">0</AVal>
+				<AVal Column="5" Row="2">0</AVal>
+				<AVal Column="6" Row="2">0</AVal>
+				<AVal Column="7" Row="2">0</AVal>
+				<AVal Column="8" Row="2">0</AVal>
+				<AVal Column="9" Row="2">0</AVal>
+				<AVal Column="10" Row="2">0</AVal>
+				<AVal Column="11" Row="2">0</AVal>
+				<AVal Column="12" Row="2">0</AVal>
+				<AVal Column="13" Row="2">0</AVal>
+				<AVal Column="14" Row="2">0</AVal>
+				<AVal Column="15" Row="2">0</AVal>
+				<AVal Column="16" Row="2">0</AVal>
+				<AVal Column="17" Row="2">0</AVal>
+				<AVal Column="18" Row="2">0</AVal>
+				<AVal Column="19" Row="2">0</AVal>
+				<AVal Column="20" Row="2">0</AVal>
+				<AVal Column="21" Row="2">0</AVal>
+				<AVal Column="22" Row="2">0</AVal>
+				<AVal Column="23" Row="2">0</AVal>
+				<AVal Column="24" Row="2">0</AVal>
+				<AVal Column="25" Row="2">0</AVal>
+				<AVal Column="26" Row="2">0</AVal>
+			</ArrayValues>
+		</Length>
+		<Length Name="gs_AddConnections">
+			<Description><![CDATA["Anschluss Additional Daten"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<ArrayValues FirstDimension="2" SecondDimension="2">
+				<AVal Column="1" Row="1">0</AVal>
+				<AVal Column="2" Row="1">0</AVal>
+				<AVal Column="1" Row="2">0</AVal>
+				<AVal Column="2" Row="2">0</AVal>
+			</ArrayValues>
+		</Length>
+		<Material Name="mat1">
+			<Description><![CDATA["Material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>80</Value>
+		</Material>
+		<Integer Name="iStyle">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<PenColor Name="gs_cont_pen">
+			<Description><![CDATA["Konturstift"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</PenColor>
+		<Length Name="ConPosX_1">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>-0.06</Value>
+		</Length>
+		<Length Name="ConPosY_1">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.06</Value>
+		</Length>
+		<Length Name="ConPosZ_1">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.15</Value>
+		</Length>
+		<Length Name="ConLength_1">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.86</Value>
+		</Length>
+		<Length Name="ConPosX_2">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.86</Value>
+		</Length>
+		<Length Name="ConPosY_2">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.065</Value>
+		</Length>
+		<Length Name="ConPosZ_2">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.15</Value>
+		</Length>
+		<Length Name="ConLength_2">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0.2</Value>
+		</Length>
+		<Length Name="bprismasch_E">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+	</Parameters>
+</ParamSection>

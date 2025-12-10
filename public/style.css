@@ -1,0 +1,703 @@
+:root {
+	--bg-color: #2e3440; /* Nordlicht-Farben */
+	--panel-bg: #3b4252;
+	--header-bg: #4c566a;
+	--text-color: #eceff4;
+	--accent-color: #88c0d0;
+	--button-bg: #5e81ac;
+	--button-hover-bg: #81a1c1;
+	--border-color: #4c566a;
+	--dialog-bg: #d8dee9; /* Helles Grau für den GDL-Dialog */
+	--dialog-border: #8899a6;
+	--selected-border: #bf616a; /* Rot für ausgewählte Elemente/Zeilen */
+	--table-header-bg: #4c566a;
+	--table-row-hover: #5e6878;
+	--table-border-light: #6a7486;
+	--table-text-color: #d8dee9;
+}
+
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	display: flex;
+	justify-content: center;
+	align-items: flex-start; /* Align to top */
+	min-height: 100vh;
+	padding: 20px; /* Add some padding around the whole app */
+	box-sizing: border-box;
+}
+
+.app-container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 1920px; /* ANPASSUNG: Maximale Breite auf 1920px */
+	min-height: 800px; /* Minimum height for the app container */
+	background-color: var(--panel-bg);
+	border: 1px solid var(--border-color);
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+/* Header Styling (Common) */
+.app-header {
+	background-color: var(--header-bg);
+	padding: 10px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid var(--border-color);
+	box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.header-left, .header-right {
+	display: flex;
+	align-items: center;
+}
+
+.logo {
+	font-weight: bold;
+	font-size: 1.5em;
+	color: var(--accent-color);
+	margin-right: 20px;
+}
+
+.project-name {
+	font-size: 0.9em;
+	color: #d8dee9;
+}
+
+.header-btn {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: none;
+	padding: 8px 15px;
+	margin-left: 8px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.header-btn:hover {
+	background-color: var(--button-hover-bg);
+}
+
+.header-btn.primary {
+	background-color: var(--accent-color);
+	color: var(--panel-bg);
+	font-weight: bold;
+}
+
+.header-btn.primary:hover {
+	background-color: #a3c9d8;
+}
+
+.separator {
+	color: #6a7486;
+	margin: 0 10px;
+}
+
+.lang-switcher select {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: 1px solid var(--border-color);
+	padding: 7px 10px;
+	border-radius: 4px;
+	margin-left: 15px;
+	cursor: pointer;
+}
+
+/* Main Navigation (Common) */
+.main-nav {
+	display: flex;
+	background-color: var(--panel-bg);
+	border-bottom: 1px solid var(--border-color);
+	padding: 0 20px;
+}
+
+.nav-button {
+	background-color: transparent;
+	color: var(--text-color);
+	border: none;
+	padding: 10px 20px;
+	cursor: pointer;
+	font-size: 1.1em;
+	transition: background-color 0.2s ease, color 0.2s ease, border-bottom 0.2s ease;
+	border-bottom: 3px solid transparent;
+	text-decoration: none; /* Make it look like a button, not a link */
+}
+
+.nav-button:hover {
+	background-color: #4c566a;
+}
+
+.nav-button.active {
+	color: var(--accent-color);
+	border-bottom: 3px solid var(--accent-color);
+	font-weight: bold;
+}
+
+/* Main Content Layout (Common) */
+.app-main {
+	display: flex;
+	flex: 1; /* Take up remaining vertical space */
+	background-color: #343a47; /* Slightly lighter than panel-bg for contrast */
+}
+
+.left-panel, .right-panel {
+	background-color: var(--panel-bg);
+	padding: 20px;
+	width: 250px; /* Fixed width for side panels */
+	border-right: 1px solid var(--border-color);
+	overflow-y: auto; /* Enable scrolling if content overflows */
+	flex-shrink: 0; /* Prevent shrinking */
+}
+
+.right-panel {
+	border-left: 1px solid var(--border-color);
+	border-right: none;
+}
+
+.left-panel h3, .right-panel h3 {
+	color: var(--accent-color);
+	margin-top: 0;
+	margin-bottom: 15px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid var(--border-color);
+}
+
+/* Action Buttons in Left Panel (Common) */
+.action-btn {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: none;
+	padding: 10px 15px;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	width: 100%;
+	text-align: left;
+}
+
+.action-btn:hover {
+	background-color: var(--button-hover-bg);
+}
+
+.action-btn.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	background-color: #4c566a;
+}
+
+
+/* UI Designer Specific Styles (From previous mockup, now applied to .ui-designer-page) */
+.ui-designer-page .toolbox-item {
+	background-color: var(--button-bg);
+	padding: 10px;
+	margin-bottom: 8px;
+	border-radius: 4px;
+	cursor: grab;
+	transition: background-color 0.2s ease;
+	text-align: center;
+	color: var(--text-color);
+}
+
+.ui-designer-page .toolbox-item:hover {
+	background-color: var(--button-hover-bg);
+}
+
+.ui-designer-page .toolbox-item.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	background-color: #4c566a;
+}
+
+.ui-designer-page .central-panel {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 20px;
+	overflow: auto;
+	position: relative;
+}
+
+.ui-designer-page .canvas-container {
+	position: relative;
+	background-color: #5e6878;
+	border: 1px solid var(--border-color);
+	box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+	padding: 20px;
+	border-radius: 4px;
+}
+
+.ui-designer-page .ui-dialog-frame {
+	background-color: var(--dialog-bg);
+	border: 1px solid var(--dialog-border);
+	position: relative;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.ui-designer-page .tab-bar {
+	display: flex;
+	background-color: var(--header-bg);
+	border-bottom: 1px solid var(--dialog-border);
+	padding: 0 5px;
+}
+
+.ui-designer-page .tab-button {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: 1px solid var(--button-bg);
+	border-bottom: none;
+	padding: 8px 15px;
+	margin-right: 2px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+	font-size: 0.9em;
+}
+
+.ui-designer-page .tab-button:hover:not(.active) {
+	background-color: var(--button-hover-bg);
+}
+
+.ui-designer-page .tab-button.active {
+	background-color: var(--dialog-bg);
+	color: var(--panel-bg);
+	border-color: var(--dialog-border);
+	border-bottom-color: var(--dialog-bg);
+	position: relative;
+	top: 1px;
+	z-index: 1;
+}
+
+.ui-designer-page .current-page-content {
+	padding: 15px;
+	position: relative;
+	min-height: calc(100% - 40px);
+}
+
+.ui-designer-page .ui-element-mockup {
+	position: absolute;
+	background-color: #f7f7f7;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #333;
+	font-size: 0.8em;
+	cursor: default;
+	user-select: none;
+	transition: box-shadow 0.1s ease;
+}
+
+.ui-designer-page .ui-element-mockup.draggable {
+	cursor: move;
+}
+
+.ui-designer-page .ui-element-mockup.resizable {
+	cursor: nwse-resize;
+}
+
+.ui-designer-page .ui-element-mockup:hover {
+	box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+.ui-designer-page .ui-element-mockup.selected {
+	border: 1px solid var(--selected-border);
+	box-shadow: 0 0 0 1px var(--selected-border);
+}
+
+.ui-designer-page .ui-outfield-label {
+	padding: 0 5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ui-designer-page .ui-infield-input {
+	width: calc(100% - 10px);
+	height: calc(100% - 6px);
+	border: 1px solid #ccc;
+	padding: 2px 5px;
+	background-color: white;
+	box-sizing: border-box;
+	color: #333;
+}
+
+.ui-designer-page .handle {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background-color: var(--selected-border);
+	border: 1px solid white;
+	z-index: 10;
+	opacity: 0;
+}
+.ui-designer-page .ui-element-mockup.selected .handle {
+	opacity: 1;
+}
+
+.ui-designer-page .handle.top-left { top: -4px; left: -4px; cursor: nwse-resize; }
+.ui-designer-page .handle.top-right { top: -4px; right: -4px; cursor: nesw-resize; }
+.ui-designer-page .handle.bottom-left { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.ui-designer-page .handle.bottom-right { bottom: -4px; right: -4px; cursor: nwse-resize; }
+.ui-designer-page .handle.top { top: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.ui-designer-page .handle.bottom { bottom: -4px; left: calc(50% - 4px); cursor: ns-resize; }
+.ui-designer-page .handle.left { left: -4px; top: calc(50% - 4px); cursor: ew-resize; }
+.ui-designer-page .handle.right { right: -4px; top: calc(50% - 4px); cursor: ew-resize; }
+
+
+.ui-designer-page .right-panel select,
+.ui-designer-page .right-panel input[type="text"],
+.ui-designer-page .right-panel input[type="number"] {
+	width: calc(100% - 12px);
+	padding: 8px 5px;
+	margin-bottom: 10px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background-color: #4c566a;
+	color: var(--text-color);
+	box-sizing: border-box;
+}
+
+.ui-designer-page .right-panel label {
+	display: block;
+	margin-bottom: 5px;
+	font-size: 0.9em;
+	color: #d8dee9;
+}
+
+.ui-designer-page .right-panel .properties-section {
+	margin-bottom: 30px;
+	background-color: #3b4252;
+	padding: 15px;
+	border-radius: 4px;
+	border: 1px solid var(--border-color);
+}
+
+.ui-designer-page .right-panel .language-input {
+	margin-top: 15px;
+	border-top: 1px dashed var(--border-color);
+	padding-top: 15px;
+}
+
+
+/* Parameter Management Page Specific Styles (.param-management-page) */
+.param-management-page .central-panel-table {
+	flex: 1;
+	padding: 20px;
+	overflow-x: auto; /* Allow horizontal scrolling for wide tables, if absolutely necessary */
+	display: flex;
+	flex-direction: column;
+}
+
+.param-management-page .central-panel-table h3 {
+	color: var(--accent-color);
+	margin-top: 0;
+	margin-bottom: 15px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.param-management-page .table-controls {
+	display: flex;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.param-management-page .table-controls label {
+	margin-right: 10px;
+	color: #d8dee9;
+}
+
+.param-management-page .table-controls input[type="text"] {
+	flex: 1;
+	max-width: 300px;
+	padding: 8px 10px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background-color: #4c566a;
+	color: var(--text-color);
+}
+
+.param-management-page .param-table-container {
+	flex: 1;
+	overflow-y: auto; /* Vertical scrolling for the table body */
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+}
+
+.param-management-page .param-table {
+	width: 100%; /* Passt sich an die verfügbare Breite des Containers an */
+	border-collapse: collapse;
+	font-size: 0.9em;
+	color: var(--table-text-color);
+	/* min-width: 1200px; <-- ENTFERNT, um flexible Anpassung zu ermöglichen */
+}
+
+.param-management-page .param-table th, .param-management-page .param-table td {
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--border-color);
+	text-align: left;
+	white-space: nowrap; /* Verhindert Zeilenumbruch innerhalb der Zelle */
+	/* Optional: Füge hier spezifische Breiten für Spalten hinzu, wenn diese nicht flexibel sein sollen */
+	/* z.B. width: 40px für Checkboxen, width: 100px für Typ, etc. */
+}
+
+.param-management-page .param-table th {
+	background-color: var(--table-header-bg);
+	color: var(--text-color);
+	font-weight: bold;
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	cursor: pointer;
+}
+
+.param-management-page .param-table th .fas {
+	margin-left: 5px;
+	color: #a3c9d8;
+}
+.param-management-page .param-table th:hover .fas {
+	color: var(--accent-color);
+}
+
+.param-management-page .param-table td {
+	background-color: #343a47;
+}
+
+.param-management-page .param-table tbody tr:nth-child(even) td {
+	background-color: #3b4252;
+}
+
+.param-management-page .param-table tbody tr:hover td {
+	background-color: var(--table-row-hover);
+	cursor: pointer;
+}
+
+.param-management-page .param-table tbody tr.selected td {
+	background-color: #5d677d;
+	outline: 1px solid var(--selected-border);
+}
+
+.param-management-page .param-table input[type="checkbox"] {
+	margin: 0;
+	transform: scale(1.2);
+}
+
+.param-management-page .param-table td[contenteditable="true"] {
+	cursor: text;
+	border: 1px dashed transparent;
+}
+.param-management-page .param-table td[contenteditable="true"]:focus {
+	outline: none;
+	border-color: var(--accent-color);
+	background-color: #4c566a;
+}
+
+.param-management-page .param-table .drag-handle {
+	cursor: grab;
+	text-align: center;
+	width: 20px;
+	color: #a3c9d8;
+}
+.param-management-page .param-table .drag-handle:hover {
+	color: var(--accent-color);
+}
+
+.param-management-page .param-table .param-type {
+	font-style: italic;
+	color: #b48ead;
+	width: 70px; /* Feste Breite für Typ-Spalte, um sie kompakt zu halten */
+}
+
+/* Right Panel (Detail Editor for Parameter Management Page) */
+.param-management-page .right-panel select,
+.param-management-page .right-panel input[type="text"],
+.param-management-page .right-panel input[type="number"],
+.param-management-page .right-panel textarea {
+	width: calc(100% - 12px);
+	padding: 8px 5px;
+	margin-bottom: 10px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background-color: #4c566a;
+	color: var(--text-color);
+	box-sizing: border-box;
+}
+
+.param-management-page .right-panel label {
+	display: flex; /* Use flex to align checkbox next to label text */
+	align-items: center;
+	margin-bottom: 5px;
+	font-size: 0.9em;
+	color: #d8dee9;
+}
+.param-management-page .right-panel label input[type="checkbox"] {
+	margin-right: 8px; /* Space between checkbox and text */
+	transform: scale(1.1);
+}
+
+.param-management-page .right-panel .properties-section {
+	margin-bottom: 30px;
+	background-color: #3b4252;
+	padding: 15px;
+	border-radius: 4px;
+	border: 1px solid var(--border-color);
+}
+
+/* Language Tabs in Right Panel */
+.param-management-page .language-tabs .tab-buttons {
+	display: flex;
+	margin-bottom: 10px;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.param-management-page .language-tabs .lang-tab {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: 1px solid var(--button-bg);
+	border-bottom: none;
+	padding: 5px 10px;
+	margin-right: 5px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	cursor: pointer;
+	font-size: 0.85em;
+	transition: background-color 0.2s ease;
+}
+
+.param-management-page .language-tabs .lang-tab:hover:not(.active) {
+	background-color: var(--button-hover-bg);
+}
+
+.param-management-page .language-tabs .lang-tab.active {
+	background-color: var(--panel-bg);
+	border-color: var(--border-color);
+	border-bottom-color: var(--panel-bg);
+	color: var(--accent-color);
+	font-weight: bold;
+	position: relative;
+	top: 1px;
+}
+
+.param-management-page .language-tabs .lang-content {
+	display: none;
+}
+
+.param-management-page .language-tabs .lang-content.active {
+	display: block;
+}
+
+
+/* Footer Styling (Common) */
+.app-footer {
+	background-color: var(--header-bg);
+	padding: 10px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid var(--border-color);
+	font-size: 0.85em;
+	color: #d8dee9;
+	box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+}
+
+.app-footer span {
+	margin-right: 15px;
+}
+.app-footer span:last-child {
+	margin-right: 0;
+}
+
+/* Parameter table select styling */
+.param-management-page .param-table .param-table-select {
+	width: 100%;
+	padding: 4px 8px;
+	background-color: #4c566a;
+	color: var(--text-color);
+	border: 1px solid var(--border-color);
+	border-radius: 3px;
+	font-size: 0.85em;
+	cursor: pointer;
+}
+
+.param-management-page .param-table .param-table-select:hover {
+	background-color: #5e6878;
+}
+
+.param-management-page .param-table .param-table-select:focus {
+	outline: none;
+	border-color: var(--accent-color);
+}
+
+/* Header Selectors */
+.selector-group {
+	display: flex;
+	align-items: center;
+	margin-left: 20px;
+	gap: 8px;
+}
+
+.selector-group label {
+	color: #d8dee9;
+	font-size: 0.9em;
+	white-space: nowrap;
+}
+
+.header-select {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: 1px solid var(--border-color);
+	padding: 6px 12px;
+	border-radius: 4px;
+	min-width: 200px;
+	max-width: 300px;
+	cursor: pointer;
+	font-size: 0.9em;
+}
+
+.header-select:hover {
+	background-color: var(--button-hover-bg);
+}
+
+.header-select:focus {
+	outline: none;
+	border-color: var(--accent-color);
+}
+
+.header-select:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.icon-btn {
+	background-color: var(--button-bg);
+	color: var(--text-color);
+	border: none;
+	padding: 6px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	font-size: 0.9em;
+}
+
+.icon-btn:hover {
+	background-color: var(--button-hover-bg);
+}
+
+.icon-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}

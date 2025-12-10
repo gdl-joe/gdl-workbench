@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GDL-UI-Studio - UI Designer</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+	<div class="app-container">
+		<!-- HEADER -->
+		<header class="app-header">
+			<div class="header-left">
+				<span class="logo">GDL-UI-Studio</span>
+				<span class="project-name">Projekt: Mein_GDL_Objekt.gsm</span>
+			</div>
+			<div class="header-right">
+				<button class="header-btn">Neues Projekt</button>
+				<button class="header-btn">Laden</button>
+				<button class="header-btn">Speichern</button>
+				<span class="separator">|</span>
+				<button class="header-btn primary">GDL-Skripte generieren</button>
+				<button class="header-btn">Download</button>
+				<div class="lang-switcher">
+					<select>
+						<option value="de">Deutsch</option>
+						<option value="en">English</option>
+					</select>
+				</div>
+			</div>
+		</header>
+
+		<!-- MAIN NAVIGATION -->
+		<nav class="main-nav">
+			<a href="index.html" class="nav-button active">UI Designer</a>
+			<a href="param-management.html" class="nav-button">Parameterverwaltung</a>
+		</nav>
+
+		<!-- MAIN CONTENT AREA - UI Designer -->
+		<main class="app-main ui-designer-page">
+			<aside class="left-panel">
+				<h3>UI-Elemente</h3>
+				<div class="toolbox-item"><span>UI_OUTFIELD</span></div>
+				<div class="toolbox-item"><span>UI_INFIELD</span></div>
+				<div class="toolbox-item"><span>UI_BUTTON</span></div>
+				<div class="toolbox-item"><span>UI_SEPARATOR</span></div>
+				<div class="toolbox-item"><span>UI_RADIO_BUTTON</span></div>
+				<div class="toolbox-item"><span>UI_CHECKBOX</span></div>
+				<div class="toolbox-item disabled">(UI_PICTURE - P2)</div>
+
+				<h3>Layout</h3>
+				<div class="toolbox-item"><span>Leere Zeile</span></div>
+				<div class="toolbox-item disabled">(2-Sp. Zeile - P2)</div>
+			</aside>
+
+			<section class="central-panel">
+				<div class="canvas-container">
+					<div class="ui-dialog-frame" style="width: 444px; height: 266px;">
+						<div class="tab-bar">
+							<button class="tab-button active">Allgemein</button>
+							<button class="tab-button">Multi-Einträge</button>
+							<button class="tab-button">Text + Rahmen</button>
+							<button class="tab-button">Zeiger + Pfeil</button>
+						</div>
+						<div class="current-page-content">
+							<div class="ui-element-mockup" style="top: 45px; left: 10px; width: 150px; height: 24px;">
+								<span class="ui-outfield-label">Import: Dateiname</span>
+							</div>
+							<div class="ui-element-mockup draggable resizable selected" style="top: 45px; left: 170px; width: 200px; height: 24px;">
+								<input type="text" value="filename" class="ui-infield-input">
+								<div class="handle top-left"></div>
+								<div class="handle top-right"></div>
+								<div class="handle bottom-left"></div>
+								<div class="handle bottom-right"></div>
+								<div class="handle top"></div>
+								<div class="handle bottom"></div>
+								<div class="handle left"></div>
+								<div class="handle right"></div>
+							</div>
+
+							<div class="ui-element-mockup" style="top: 75px; left: 10px; width: 150px; height: 24px;">
+								<span class="ui-outfield-label">Kategorie der Auswahl</span>
+							</div>
+							<div class="ui-element-mockup draggable resizable" style="top: 75px; left: 170px; width: 200px; height: 24px;">
+								<input type="text" value="str_kat_input" class="ui-infield-input">
+								<div class="handle top-left"></div>
+								<div class="handle top-right"></div>
+								<div class="handle bottom-left"></div>
+								<div class="handle bottom-right"></div>
+								<div class="handle top"></div>
+								<div class="handle bottom"></div>
+								<div class="handle left"></div>
+								<div class="handle right"></div>
+							</div>
+
+							<div class="ui-element-mockup draggable resizable" style="top: 105px; left: 10px; width: 360px; height: 24px; border: 1px solid #ccc; background-color: #f0f0f0;">
+								<span style="display: block; text-align: center; line-height: 24px; color: #888;">UI_SEPARATOR (Placeholder)</span>
+								<div class="handle top-left"></div>
+								<div class="handle top-right"></div>
+								<div class="handle bottom-left"></div>
+								<div class="handle bottom-right"></div>
+								<div class="handle top"></div>
+								<div class="handle bottom"></div>
+								<div class="handle left"></div>
+								<div class="handle right"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<aside class="right-panel">
+				<h3>Seite</h3>
+				<select class="page-select">
+					<option>Allgemein</option>
+					<option>Multi-Einträge</option>
+					<option>Text + Rahmen</option>
+					<option>Zeiger + Pfeil</option>
+				</select>
+
+				<h3>Eigenschaften</h3>
+				<div class="properties-section">
+					<label>Typ:</label><span>UI_INFIELD</span>
+					<label>Name:</label><input type="text" value="filename">
+					<label>Beschriftung:</label><input type="text" value="Import: Dateiname">
+					<label>GDL-Parameter:</label>
+					<select>
+						<option>filename</option>
+						<option>str_kat_input</option>
+						<option>str_kat_use</option>
+						<option>int_anzeige</option>
+					</select>
+					<label>Breite:</label><input type="number" value="200">
+					<label>Höhe:</label><input type="number" value="24">
+					<div class="language-input">
+						<label>Beschriftung (DE):</label><input type="text" value="Import: Dateiname">
+						<label>Beschriftung (EN):</label><input type="text" value="Import: Filename">
+					</div>
+				</div>
+			</aside>
+		</main>
+
+		<!-- FOOTER -->
+		<footer class="app-footer">
+			<span class="status-message">Status: Projekt geladen.</span>
+			<span class="grid-info">Gitter: 10px</span>
+			<span class="zoom-info">Zoom: 100%</span>
+		</footer>
+	</div>
+</body>
+</html>

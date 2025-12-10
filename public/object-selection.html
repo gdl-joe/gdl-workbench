@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDL-UI-Studio - Objektauswahl</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #2e3440;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #3b4252;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: #88c0d0;
+            font-size: 2em;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #5e81ac;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #81a1c1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(94, 129, 172, 0.3);
+        }
+
+        .btn-secondary {
+            background: #4c566a;
+            color: #d8dee9;
+        }
+
+        .btn-secondary:hover {
+            background: #5e6a7e;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .search-bar {
+            background: #3b4252;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #4c566a;
+            border-radius: 6px;
+            font-size: 16px;
+            background: #2e3440;
+            color: #d8dee9;
+            transition: border 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #88c0d0;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: 2px solid #4c566a;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            background: #2e3440;
+            color: #d8dee9;
+        }
+
+        .filter-tab.active {
+            background: #5e81ac;
+            color: white;
+            border-color: #5e81ac;
+        }
+
+        .objects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .object-card {
+            background: #3b4252;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            color: #eceff4;
+        }
+
+        .object-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+            background: #434c5e;
+        }
+
+        .object-card.status-active {
+            border-left: 5px solid #a3be8c;
+            background: #434c5e;
+        }
+
+        .object-card.status-archive {
+            border-left: 5px solid #4c566a;
+            background: #3b4252;
+        }
+
+        .object-card.status-wip {
+            border-left: 5px solid #ebcb8b;
+            background: #434c5e;
+        }
+
+        .object-card.status-urgent {
+            border-left: 5px solid #bf616a;
+            background: #434c5e;
+        }
+
+        .object-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .object-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #eceff4;
+            margin-bottom: 5px;
+        }
+
+        .object-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active { background: rgba(163, 190, 140, 0.2); color: #a3be8c; }
+        .status-archive { background: rgba(76, 86, 106, 0.2); color: #d8dee9; }
+        .status-wip { background: rgba(235, 203, 139, 0.2); color: #ebcb8b; }
+        .status-urgent { background: rgba(191, 97, 106, 0.2); color: #bf616a; }
+
+        .object-description {
+            color: #d8dee9;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+
+        .object-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 12px;
+            color: #8899a6;
+            margin-bottom: 15px;
+        }
+
+        .object-meta div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .object-meta strong {
+            color: #eceff4;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .object-path {
+            background: #2e3440;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #88c0d0;
+            margin-bottom: 15px;
+            font-family: monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .object-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .object-actions button {
+            flex: 1;
+            min-width: 70px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #3b4252;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #eceff4;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #eceff4;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #4c566a;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #2e3440;
+            color: #d8dee9;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #3b4252;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .empty-state h2 {
+            color: #eceff4;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #d8dee9;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            background: #3b4252;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #88c0d0;
+        }
+
+        .stat-label {
+            color: #d8dee9;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="breadcrumb">
+                <a href="dashboard.html">🏠 Dashboard</a>
+                <span>→</span>
+                <span id="projectName">Objekte</span>
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-secondary" onclick="goBack()">← Zurück</button>
+                <button class="btn btn-primary" onclick="showCreateObjectModal()">
+                    ➕ Neues Objekt
+                </button>
+            </div>
+        </header>
+
+        <div class="project-info" id="projectInfo" style="display:none;">
+            <h2 id="projectInfoName"></h2>
+            <p id="projectInfoDescription"></p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalObjects">0</div>
+                <div class="stat-label">Objekte</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalParameters">0</div>
+                <div class="stat-label">Parameter</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Objekte durchsuchen..." oninput="filterObjects()">
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-filter="all" onclick="setFilter('all')">Alle</div>
+                <div class="filter-tab" data-filter="active" onclick="setFilter('active')">Aktiv</div>
+                <div class="filter-tab" data-filter="wip" onclick="setFilter('wip')">WIP</div>
+                <div class="filter-tab" data-filter="urgent" onclick="setFilter('urgent')">Dringend</div>
+                <div class="filter-tab" data-filter="archive" onclick="setFilter('archive')">Archiv</div>
+            </div>
+        </div>
+
+        <div class="objects-grid" id="objectsGrid">
+            <!-- Objects will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Create/Edit Object Modal -->
+    <div class="modal" id="objectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Neues Objekt erstellen</h2>
+            </div>
+            <form id="objectForm">
+                <input type="hidden" id="objectId">
+                
+                <div class="form-group">
+                    <label for="objectName">Objektname * (z.B. Fenster_Standard.gsm)</label>
+                    <input type="text" id="objectName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="objectDescription">Beschreibung</label>
+                    <textarea id="objectDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="objectStatus">Status</label>
+                    <select id="objectStatus">
+                        <option value="active">Aktiv</option>
+                        <option value="wip">Work in Progress</option>
+                        <option value="urgent">Dringend</option>
+                        <option value="archive">Archiv</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="objectPath">Dateipfad (optional)</label>
+                    <input type="text" id="objectPath" placeholder="/Pfad/zur/GSM/Datei">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '../backend/public/api';
+        let currentProjectId = null;
+        let currentProject = null;
+        let allObjects = [];
+        let currentFilter = 'all';
+
+        // Load objects on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            currentProjectId = localStorage.getItem('currentProjectId');
+            
+            if (!currentProjectId) {
+                alert('Kein Projekt ausgewählt. Zurück zum Dashboard...');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            loadProject();
+            loadObjects();
+        });
+
+        async function loadProject() {
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentProjectId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentProject = data.data;
+                    document.getElementById('projectName').textContent = currentProject.name;
+                    document.getElementById('projectInfoName').textContent = currentProject.name;
+                    document.getElementById('projectInfoDescription').textContent = 
+                        currentProject.description || 'Keine Beschreibung';
+                    document.getElementById('projectInfo').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading project:', error);
+            }
+        }
+
+        async function loadObjects() {
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentProjectId}/objects`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allObjects = data.data || [];
+                    updateStats();
+                    renderObjects();
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading objects:', error);
+                showEmptyState();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalObjects').textContent = allObjects.length;
+            const totalParams = allObjects.reduce((sum, obj) => sum + (obj.parameter_count || 0), 0);
+            document.getElementById('totalParameters').textContent = totalParams;
+        }
+
+        function renderObjects() {
+            const grid = document.getElementById('objectsGrid');
+            
+            if (allObjects.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            const filtered = filterObjectsBySearch();
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><h2>Keine Objekte gefunden</h2><p>Versuchen Sie eine andere Suche oder Filter</p></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(obj => `
+                <div class="object-card status-${obj.status}" onclick="openObject(${obj.id})">
+                    <div class="object-header">
+                        <div>
+                            <div class="object-name">${escapeHtml(obj.name)}</div>
+                            <span class="object-status status-${obj.status}">${getStatusLabel(obj.status)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="object-description">
+                        ${escapeHtml(obj.description || 'Keine Beschreibung')}
+                    </div>
+                    
+                    ${obj.file_path ? `
+                        <div class="object-path" title="${escapeHtml(obj.file_path)}">
+                            📄 ${escapeHtml(obj.file_path)}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="object-meta">
+                        <div>
+                            <strong>Parameter</strong>
+                            ${obj.parameter_count || 0}
+                        </div>
+                        <div>
+                            <strong>Geändert</strong>
+                            ${formatDate(obj.updated_at)}
+                        </div>
+                    </div>
+                    
+                    <div class="object-actions" onclick="event.stopPropagation()">
+                        <button class="btn btn-secondary" onclick="editObject(${obj.id})">✏️ Bearbeiten</button>
+                        <button class="btn btn-secondary" onclick="duplicateObject(${obj.id})">📋 Duplizieren</button>
+                        <button class="btn btn-danger" onclick="deleteObject(${obj.id})">🗑️ Löschen</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterObjectsBySearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            return allObjects.filter(obj => {
+                // Filter by status
+                if (currentFilter !== 'all' && obj.status !== currentFilter) {
+                    return false;
+                }
+                
+                // Filter by search term
+                if (searchTerm) {
+                    const nameMatch = obj.name.toLowerCase().includes(searchTerm);
+                    const descMatch = (obj.description || '').toLowerCase().includes(searchTerm);
+                    const pathMatch = (obj.file_path || '').toLowerCase().includes(searchTerm);
+                    return nameMatch || descMatch || pathMatch;
+                }
+                
+                return true;
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === filter);
+            });
+            renderObjects();
+        }
+
+        function filterObjects() {
+            renderObjects();
+        }
+
+        function showCreateObjectModal() {
+            document.getElementById('modalTitle').textContent = 'Neues Objekt erstellen';
+            document.getElementById('objectForm').reset();
+            document.getElementById('objectId').value = '';
+            document.getElementById('objectModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('objectModal').classList.remove('active');
+        }
+
+        async function editObject(id) {
+            const obj = allObjects.find(o => o.id === id);
+            if (!obj) return;
+
+            document.getElementById('modalTitle').textContent = 'Objekt bearbeiten';
+            document.getElementById('objectId').value = obj.id;
+            document.getElementById('objectName').value = obj.name;
+            document.getElementById('objectDescription').value = obj.description || '';
+            document.getElementById('objectStatus').value = obj.status || 'active';
+            document.getElementById('objectPath').value = obj.file_path || '';
+            document.getElementById('objectModal').classList.add('active');
+        }
+
+        async function duplicateObject(id) {
+            const obj = allObjects.find(o => o.id === id);
+            if (!obj) return;
+
+            if (!confirm(`Möchten Sie das Objekt "${obj.name}" wirklich duplizieren?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/gdl-objects/${id}/duplicate`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Objekt erfolgreich dupliziert!');
+                    loadObjects();
+                } else {
+                    alert('Fehler beim Duplizieren: ' + (data.error || 'Unbekannter Fehler'));
+                }
+            } catch (error) {
+                console.error('Error duplicating object:', error);
+                alert('Fehler beim Duplizieren des Objekts');
+            }
+        }
+
+        async function deleteObject(id) {
+            const obj = allObjects.find(o => o.id === id);
+            if (!obj) return;
+
+            if (!confirm(`Möchten Sie das Objekt "${obj.name}" wirklich löschen?\n\nDies wird auch alle zugehörigen Parameter löschen!`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/gdl-objects/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    loadObjects();
+                } else {
+                    alert('Fehler beim Löschen: ' + (data.error || 'Unbekannter Fehler'));
+                }
+            } catch (error) {
+                console.error('Error deleting object:', error);
+                alert('Fehler beim Löschen des Objekts');
+            }
+        }
+
+        function openObject(id) {
+            // Save selected object to localStorage
+            localStorage.setItem('currentGdlObjectId', id);
+            // Navigate to parameter management page
+            window.location.href = 'param-management.html';
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('objectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const objectId = document.getElementById('objectId').value;
+            const formData = {
+                project_id: currentProjectId,
+                name: document.getElementById('objectName').value,
+                description: document.getElementById('objectDescription').value,
+                status: document.getElementById('objectStatus').value,
+                file_path: document.getElementById('objectPath').value || null
+            };
+
+            try {
+                const url = objectId 
+                    ? `${API_BASE}/gdl-objects/${objectId}`
+                    : `${API_BASE}/gdl-objects`;
+                
+                const method = objectId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    closeModal();
+                    loadObjects();
+                } else {
+                    alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+                }
+            } catch (error) {
+                console.error('Error saving object:', error);
+                alert('Fehler beim Speichern des Objekts');
+            }
+        });
+
+        function showEmptyState() {
+            const grid = document.getElementById('objectsGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <h2>Noch keine Objekte</h2>
+                    <p>Erstellen Sie Ihr erstes GDL-Objekt für dieses Projekt</p>
+                    <button class="btn btn-primary" onclick="showCreateObjectModal()">
+                        ➕ Neues Objekt erstellen
+                    </button>
+                </div>
+            `;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'active': 'Aktiv',
+                'archive': 'Archiv',
+                'wip': 'WIP',
+                'urgent': 'Dringend'
+            };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('de-DE', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('objectModal').addEventListener('click', (e) => {
+            if (e.target.id === 'objectModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
