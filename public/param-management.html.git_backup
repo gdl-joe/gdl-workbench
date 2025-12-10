@@ -50,7 +50,7 @@
 				<button class="action-btn import-xml" id="importXmlButton">XML Parameter Import</button>
 				<button class="action-btn import-csv">CSV Produktdaten Import</button>
 				<button class="action-btn">Parameter Export (XML)</button>
-				<button class="action-btn add-param">Neuen Parameter an markierten Stellen einfügen</button>
+				<button class="action-btn add-param">Neuen Parameter hinzufügen</button>
 				<button class="action-btn delete-param disabled">Ausgewählte löschen</button>
 			</aside>
 
@@ -66,14 +66,14 @@
 							<tr>
 								<th><input type="checkbox" class="select-all"></th>
 								<th></th> <!-- Drag Handle -->
-								<th title="Versteckt">X</th>
-								<th title="Eingerückt">E</th>
-								<th title="Fett">B</th>
-								<th title="Unique">U</th>
 								<th>Typ <i class="fas fa-sort-up"></i></th>
 								<th>Name <i class="fas fa-sort"></i></th>
 								<th>Beschreibung (DE) <i class="fas fa-sort"></i></th>
 								<th>Standardwert (DE) <i class="fas fa-sort"></i></th>
+								<th title="Fett">B</th>
+								<th title="Eingerückt">E</th>
+								<th title="Versteckt">X</th>
+								<th title="Unique">U</th>
 								<th>UI-Seite</th>
 								<th>UI</th>
 								<th>Array</th>
@@ -187,6 +187,13 @@
 			const API_BASE_URL = 'http://localhost:8888/gdl-ui-studio/backend/public/api';
 			
 			// DOM Elements
+			const projectSelector = document.getElementById('projectSelector');
+			const objectSelector = document.getElementById('objectSelector');
+			const newProjectBtn = document.getElementById('newProjectBtn');
+			const newObjectBtn = document.getElementById('newObjectBtn');
+			const refreshProjectsBtn = document.getElementById('refreshProjectsBtn');
+			const refreshObjectsBtn = document.getElementById('refreshObjectsBtn');
+			
 			const importXmlButton = document.getElementById('importXmlButton');
 			const xmlFileInput = document.getElementById('xmlFileInput');
 			const parameterTableBody = document.getElementById('parameterTableBody');
@@ -211,46 +218,92 @@
 				'Separator', 'Title', 'Dictionary', 'Profile', 'BuildingMaterial'
 			];
 		
-	
-		// Type colors mapping
-		const TYPE_COLORS = {
-			'Length': '#4a5568',
-			'String': '#2c5282',
-			'Integer': '#2d3748',
-			'Boolean': '#553c9a',
-			'Angle': '#38b2ac',
-			'RealNum': '#319795',
-			'Material': '#d69e2e',
-			'LineType': '#805ad5',
-			'FillPattern': '#805ad5',
-			'PenColor': '#dd6b20',
-			'Separator': '#2d3748',
-			'Title': '#2c5282',
-			'Dictionary': '#3182ce',
-			'Profile': '#dd6b20',
-			'BuildingMaterial': '#d69e2e'
-		};
 			// ===== INITIALIZATION =====
 			init();
 		
 			async function init() {
 				setupEventListeners();
+				await loadProjects();
 				
-				// Load object info and parameters from localStorage
-				if (currentGdlObjectId) {
-					await loadObjectInfo(currentGdlObjectId);
-					await loadParameters(currentGdlObjectId);
-				} else {
-					showMessage('Kein Objekt ausgewählt. Bitte navigieren Sie über das Dashboard.', 'warning');
+				if (currentProjectId) {
+					projectSelector.value = currentProjectId;
+					await loadObjects(currentProjectId);
+					
+					if (currentGdlObjectId) {
+						objectSelector.value = currentGdlObjectId;
+						await loadParameters(currentGdlObjectId);
+					}
 				}
 			}
 		
 			// ===== EVENT LISTENERS =====
 			function setupEventListeners() {
+				// Project selector
+				projectSelector.addEventListener('change', async (e) => {
+					const projectId = e.target.value;
+					if (projectId) {
+						currentProjectId = projectId;
+						localStorage.setItem('gdl_current_project_id', projectId);
+						await loadObjects(projectId);
+						
+						// Clear object selection
+						currentGdlObjectId = null;
+						localStorage.removeItem('gdl_current_object_id');
+						objectSelector.value = '';
+						clearParameterTable();
+					} else {
+						currentProjectId = null;
+						localStorage.removeItem('gdl_current_project_id');
+						objectSelector.innerHTML = '<option value="">-- Objekt wählen --</option>';
+						objectSelector.disabled = true;
+						clearParameterTable();
+					}
+				});
+		
+				// Object selector
+				objectSelector.addEventListener('change', async (e) => {
+					const objectId = e.target.value;
+					if (objectId) {
+						currentGdlObjectId = objectId;
+						localStorage.setItem('gdl_current_object_id', objectId);
+						await loadParameters(objectId);
+					} else {
+						currentGdlObjectId = null;
+						localStorage.removeItem('gdl_current_object_id');
+						clearParameterTable();
+					}
+				});
+		
+				// New project button
+				newProjectBtn.addEventListener('click', async () => {
+					const projectName = prompt('Neues Projekt erstellen\n\nProjektname eingeben:');
+					if (projectName && projectName.trim()) {
+						await createProject(projectName.trim());
+					}
+				});
+		
+				// New object button
+				newObjectBtn.addEventListener('click', async () => {
+					if (!currentProjectId) {
+						alert('Bitte wählen Sie zuerst ein Projekt.');
+						return;
+					}
+					const objectName = prompt('Neues GDL-Objekt erstellen\n\nObjektname eingeben (z.B. "Fenster_01.gsm"):');
+					if (objectName && objectName.trim()) {
+						await createGdlObject(objectName.trim());
+					}
+				});
+		
+				// Refresh buttons
+				refreshProjectsBtn.addEventListener('click', () => loadProjects());
+				refreshObjectsBtn.addEventListener('click', () => {
+					if (currentProjectId) loadObjects(currentProjectId);
+				});
+		
 				// Import XML
 				importXmlButton.addEventListener('click', () => {
-					if (!currentGdlObjectId) {
-						alert('Bitte wählen Sie zuerst ein Objekt über das Dashboard.');
+					if (!currentProjectId) {
+						alert('Bitte wählen Sie zuerst ein Projekt.');
 						return;
 					}
 					xmlFileInput.click();
@@ -290,7 +343,7 @@
 								alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
 							}
 						});
-					} else if (text === 'Neuen Parameter an markierten Stellen einfügen') {
+					} else if (text === 'Neuen Parameter hinzufügen') {
 						btn.addEventListener('click', showAddParameterDialog);
 					} else if (text === 'Ausgewählte löschen') {
 						btn.addEventListener('click', deleteSelectedParameters);
@@ -342,36 +395,133 @@
 				});
 			}
 		
-			// ===== UTILITY FUNCTIONS =====
-			function showMessage(message, type = 'info') {
-				if (statusMessage) {
-					statusMessage.textContent = 'Status: ' + message;
-				}
-				console.log('[' + type + '] ' + message);
-			}
-			
-			async function loadObjectInfo(objectId) {
+			// ===== PROJECT MANAGEMENT =====
+			async function loadProjects() {
 				try {
-					showMessage('Lade Objektinformationen...', 'info');
-					const response = await fetch(`${API_BASE_URL}/gdl-objects/${objectId}`);
+					statusMessage.textContent = 'Status: Projekte werden geladen...';
+					const response = await fetch(`${API_BASE_URL}/projects`);
 					const result = await response.json();
-					
-					if (response.ok && result.success) {
-						const obj = result.data;
-						currentGdlObjectName = obj.name;
-						currentProjectId = obj.project_id;
+		
+					projectSelector.innerHTML = '<option value="">-- Projekt wählen --</option>';
+		
+					if (response.ok && result.projects) {
+						result.projects.forEach(project => {
+							const option = document.createElement('option');
+							option.value = project.id;
+							option.textContent = `${project.name} (${project.object_count || 0} Objekte)`;
+							projectSelector.appendChild(option);
+						});
 						
-						const objectNameEl = document.getElementById('currentObjectName');
-						if (objectNameEl) objectNameEl.textContent = 'Objekt: ' + obj.name;
-						
-						showMessage('Objekt "' + obj.name + '" geladen', 'success');
+						if (result.projects.length === 0) {
+							statusMessage.textContent = 'Status: Keine Projekte vorhanden. Erstellen Sie ein neues Projekt.';
+						} else {
+							statusMessage.textContent = 'Status: Projekte geladen.';
+						}
 					} else {
-						showMessage('Fehler beim Laden der Objektinformationen', 'error');
-						console.error('Error loading object info:', result.error);
+						statusMessage.textContent = `Fehler beim Laden der Projekte: ${result.error || 'Unbekannter Fehler'}`;
 					}
 				} catch (error) {
-					showMessage('Netzwerkfehler: ' + error.message, 'error');
-					console.error('Error loading object info:', error);
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+					console.error('Error loading projects:', error);
+				}
+			}
+		
+			async function createProject(projectName) {
+				try {
+					statusMessage.textContent = 'Status: Projekt wird erstellt...';
+					
+					const response = await fetch(`${API_BASE_URL}/projects`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ name: projectName })
+					});
+		
+					const result = await response.json();
+		
+					if (response.ok) {
+						statusMessage.textContent = `Status: Projekt "${projectName}" erstellt.`;
+						await loadProjects();
+						projectSelector.value = result.projectId;
+						projectSelector.dispatchEvent(new Event('change'));
+					} else if (response.status === 409) {
+						const useExisting = confirm(`Projekt "${projectName}" existiert bereits.\n\nMöchten Sie dieses Projekt laden?`);
+						if (useExisting && result.existingProjectId) {
+							await loadProjects();
+							projectSelector.value = result.existingProjectId;
+							projectSelector.dispatchEvent(new Event('change'));
+						}
+					} else {
+						statusMessage.textContent = `Fehler: ${result.error}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+		
+			// ===== GDL OBJECT MANAGEMENT =====
+			async function loadObjects(projectId) {
+				try {
+					statusMessage.textContent = 'Status: GDL-Objekte werden geladen...';
+					const response = await fetch(`${API_BASE_URL}/projects/${projectId}/objects`);
+					const result = await response.json();
+		
+					objectSelector.innerHTML = '<option value="">-- Objekt wählen --</option>';
+					objectSelector.disabled = false;
+		
+					if (response.ok && result.gdl_objects) {
+						result.gdl_objects.forEach(obj => {
+							const option = document.createElement('option');
+							option.value = obj.id;
+							option.textContent = `${obj.name} (${obj.parameter_count || 0} Parameter)`;
+							objectSelector.appendChild(option);
+						});
+						
+						if (result.gdl_objects.length === 0) {
+							statusMessage.textContent = 'Status: Keine GDL-Objekte vorhanden. Erstellen Sie ein neues Objekt.';
+						} else {
+							statusMessage.textContent = 'Status: GDL-Objekte geladen.';
+						}
+					} else {
+						statusMessage.textContent = `Fehler beim Laden der Objekte: ${result.error || 'Unbekannter Fehler'}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+					console.error('Error loading objects:', error);
+				}
+			}
+		
+			async function createGdlObject(objectName) {
+				try {
+					statusMessage.textContent = 'Status: GDL-Objekt wird erstellt...';
+					
+					const response = await fetch(`${API_BASE_URL}/objects`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ 
+							project_id: currentProjectId,
+							name: objectName 
+						})
+					});
+		
+					const result = await response.json();
+		
+					if (response.ok) {
+						statusMessage.textContent = `Status: GDL-Objekt "${objectName}" erstellt.`;
+						await loadObjects(currentProjectId);
+						objectSelector.value = result.objectId;
+						objectSelector.dispatchEvent(new Event('change'));
+					} else if (response.status === 409) {
+						const useExisting = confirm(`GDL-Objekt "${objectName}" existiert bereits.\n\nMöchten Sie dieses Objekt laden?`);
+						if (useExisting && result.existingObjectId) {
+							await loadObjects(currentProjectId);
+							objectSelector.value = result.existingObjectId;
+							objectSelector.dispatchEvent(new Event('change'));
+						}
+					} else {
+						statusMessage.textContent = `Fehler: ${result.error}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
 				}
 			}
 		
@@ -437,8 +587,8 @@
 					const data = await response.json();
 		
 					if (response.ok) {
-						currentGdlObjectName = data.object_name || '';
-						allParameters = data.data || [];
+					currentGdlObjectName = data.object_name || '';
+						allParameters = data.parameters || [];
 						renderParameters();
 						statusMessage.textContent = 'Status: Parameter erfolgreich geladen.';
 					} else {
@@ -479,9 +629,6 @@
 				const row = document.createElement('tr');
 				row.dataset.parameterId = param.id;
 				row.draggable = true;
-				// Add type color
-				const bgColor = TYPE_COLORS[param.gdl_type] || '#2d3748';
-				row.style.backgroundColor = bgColor + '33'; // Add transparency
 		
 				const deTranslation = param.translations.find(t => t.language_code === 'de');
 				const descriptionDe = deTranslation ? deTranslation.description : '';
@@ -508,22 +655,21 @@
 					</select>
 				`;
 		
-			
-			row.innerHTML = `
-				<td><input type="checkbox" class="param-checkbox" data-param-id="${param.id}"></td>
-				<td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_hidden" ${param.flag_hidden ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_child" ${param.flag_child ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_bold" ${param.flag_bold ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_unique" ${param.flag_unique ? 'checked' : ''}></td>
-				<td>${typeSelectHtml}</td>
-				<td class="editable" data-field="gdl_name">${param.gdl_name}</td>
-				<td class="editable" data-field="description_de">${descriptionDe}</td>
-				<td class="editable" data-field="default_value">${defaultValueDisplay}</td>
-				<td class="editable" data-field="ui_page">${param.ui_page || 0}</td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="is_ui_element" ${param.is_ui_element ? 'checked' : ''}></td>
-				<td>${param.array_type !== 'None' ? '<button class="array-edit-btn" data-param-id="' + param.id + '" title="Array-Werte bearbeiten">⊞</button> ' + param.array_type : ''}</td>
-			`;
+				row.innerHTML = `
+					<td><input type="checkbox" class="param-checkbox" data-param-id="${param.id}"></td>
+					<td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
+					<td>${typeSelectHtml}</td>
+					<td class="editable" data-field="gdl_name">${param.gdl_name}</td>
+					<td class="editable" data-field="description_de">${descriptionDe}</td>
+					<td class="editable" data-field="default_value">${defaultValueDisplay}</td>
+					<td><input type="checkbox" class="flag-checkbox" data-field="flag_bold" ${param.flag_bold ? 'checked' : ''}></td>
+					<td><input type="checkbox" class="flag-checkbox" data-field="flag_child" ${param.flag_child ? 'checked' : ''}></td>
+					<td><input type="checkbox" class="flag-checkbox" data-field="flag_hidden" ${param.flag_hidden ? 'checked' : ''}></td>
+					<td><input type="checkbox" class="flag-checkbox" data-field="flag_unique" ${param.flag_unique ? 'checked' : ''}></td>
+					<td class="editable" data-field="ui_page">${param.ui_page || 0}</td>
+					<td><input type="checkbox" class="flag-checkbox" data-field="is_ui_element" ${param.is_ui_element ? 'checked' : ''}></td>
+					<td>${param.array_type !== 'None' ? param.array_type : ''}</td>
+				`;
 		
 				row.querySelector('.param-checkbox').addEventListener('change', handleCheckboxChange);
 				row.querySelector('.param-type-select').addEventListener('change', (e) => handleTypeChange(param.id, e));
@@ -1027,217 +1173,6 @@
 				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
 			}
 		}
-
-		
-		// ===== ARRAY EDITOR =====
-		let currentArrayParam = null;
-		
-		window.openArrayEditor = function(paramId) {
-			const param = allParameters.find(p => p.id == paramId);
-			if (!param) return;
-			
-			currentArrayParam = param;
-			
-			const modal = document.getElementById('arrayEditorModal');
-			const title = document.getElementById('arrayEditorTitle');
-			const paramNameSpan = document.getElementById('arrayParamName');
-			const arrayTypeSelect = document.getElementById('arrayTypeSelect');
-			
-			title.textContent = 'Array-Parameter Editor';
-			paramNameSpan.textContent = param.gdl_name;
-			arrayTypeSelect.value = param.array_type || 'None';
-			
-			updateArrayContainers();
-			loadArrayValues(param);
-			
-			modal.classList.add('active');
-		};
-		
-		window.closeArrayEditor = function() {
-			document.getElementById('arrayEditorModal').classList.remove('active');
-			currentArrayParam = null;
-		};
-		
-		function updateArrayContainers() {
-			const arrayType = document.getElementById('arrayTypeSelect').value;
-			const array1D = document.getElementById('array1DContainer');
-			const array2D = document.getElementById('array2DContainer');
-			const modeGroup = document.getElementById('arrayModeGroup');
-			
-			array1D.style.display = arrayType === '1D' ? 'block' : 'none';
-			array2D.style.display = arrayType === '2D' ? 'block' : 'none';
-			modeGroup.style.display = arrayType !== 'None' ? 'block' : 'none';
-		}
-		
-		function loadArrayValues(param) {
-			if (!param.default_value_json) return;
-			
-			try {
-				const values = JSON.parse(param.default_value_json);
-				
-				if (param.array_type === '1D' && Array.isArray(values)) {
-					render1DArray(values);
-				} else if (param.array_type === '2D' && Array.isArray(values)) {
-					render2DArray(values);
-				}
-			} catch (e) {
-				console.error('Error parsing array values:', e);
-			}
-		}
-		
-		function render1DArray(values) {
-			const tbody = document.getElementById('array1DBody');
-			tbody.innerHTML = '';
-			
-			values.forEach((val, idx) => {
-				const row = tbody.insertRow();
-				row.innerHTML = `
-					<td>${idx}</td>
-					<td><input type="text" value="${val}" data-index="${idx}"></td>
-					<td><button type="button" onclick="window.removeArray1DRow(${idx})">✕</button></td>
-				`;
-			});
-			
-			document.getElementById('array1DSize').textContent = `(${values.length} Elemente)`;
-		}
-		
-		function render2DArray(values) {
-			const thead = document.getElementById('array2DHead');
-			const tbody = document.getElementById('array2DBody');
-			
-			if (!values.length) return;
-			
-			const cols = values[0].length;
-			const rows = values.length;
-			
-			thead.innerHTML = '<tr><th>Zeile</th>' + 
-				Array.from({length: cols}, (_, i) => `<th>Spalte ${i}</th>`).join('') +
-				'<th></th></tr>';
-			
-			tbody.innerHTML = '';
-			values.forEach((row, rowIdx) => {
-				const tr = tbody.insertRow();
-				tr.innerHTML = '<td>' + rowIdx + '</td>' +
-					row.map((val, colIdx) => `<td><input type="text" value="${val}" data-row="${rowIdx}" data-col="${colIdx}"></td>`).join('') +
-					`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
-			});
-			
-			document.getElementById('array2DSize').textContent = `(${rows}×${cols})`;
-		}
-		
-		window.addArray1DRow = function() {
-			const tbody = document.getElementById('array1DBody');
-			const idx = tbody.rows.length;
-			const row = tbody.insertRow();
-			row.innerHTML = `
-				<td>${idx}</td>
-				<td><input type="text" value="0" data-index="${idx}"></td>
-				<td><button type="button" onclick="window.removeArray1DRow(${idx})">✕</button></td>
-			`;
-		};
-		
-		window.removeArray1DRow = function(idx) {
-			const tbody = document.getElementById('array1DBody');
-			tbody.deleteRow(idx);
-			Array.from(tbody.rows).forEach((row, newIdx) => {
-				row.cells[0].textContent = newIdx;
-				row.cells[1].querySelector('input').dataset.index = newIdx;
-			});
-		};
-		
-		window.addArray2DRow = function() {
-			const tbody = document.getElementById('array2DBody');
-			const cols = tbody.rows.length > 0 ? tbody.rows[0].cells.length - 2 : 1;
-			const rowIdx = tbody.rows.length;
-			
-			const tr = tbody.insertRow();
-			tr.innerHTML = '<td>' + rowIdx + '</td>' +
-				Array.from({length: cols}, (_, colIdx) => 
-					`<td><input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}"></td>`
-				).join('') +
-				`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
-		};
-		
-		window.addArray2DCol = function() {
-			const thead = document.getElementById('array2DHead');
-			const tbody = document.getElementById('array2DBody');
-			
-			if (!tbody.rows.length) {
-				window.addArray2DRow();
-				return;
-			}
-			
-			const colIdx = tbody.rows[0].cells.length - 2;
-			
-			const headerRow = thead.rows[0];
-			const th = document.createElement('th');
-			th.textContent = `Spalte ${colIdx}`;
-			headerRow.insertBefore(th, headerRow.lastChild);
-			
-			Array.from(tbody.rows).forEach((row, rowIdx) => {
-				const td = document.createElement('td');
-				td.innerHTML = `<input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}">`;
-				row.insertBefore(td, row.lastChild);
-			});
-		};
-		
-		window.removeArray2DRow = function(idx) {
-			const tbody = document.getElementById('array2DBody');
-			tbody.deleteRow(idx);
-		};
-		
-		window.saveArrayValues = async function() {
-			if (!currentArrayParam) return;
-			
-			const arrayType = document.getElementById('arrayTypeSelect').value;
-			let values = null;
-			
-			if (arrayType === '1D') {
-				const inputs = document.querySelectorAll('#array1DBody input');
-				values = Array.from(inputs).map(inp => inp.value);
-			} else if (arrayType === '2D') {
-				const tbody = document.getElementById('array2DBody');
-				values = Array.from(tbody.rows).map(row => 
-					Array.from(row.querySelectorAll('input')).map(inp => inp.value)
-				);
-			}
-			
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${currentArrayParam.id}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						array_type: arrayType,
-						default_value_json: JSON.stringify(values)
-					})
-				});
-				
-				if (response.ok) {
-					currentArrayParam.array_type = arrayType;
-					currentArrayParam.default_value_json = JSON.stringify(values);
-					await loadParameters(currentGdlObjectId);
-					window.closeArrayEditor();
-					statusMessage.textContent = 'Status: Array-Werte gespeichert.';
-				}
-			} catch (error) {
-				statusMessage.textContent = `Fehler: ${error.message}`;
-			}
-		};
-		
-		// Setup array button click handlers
-		document.addEventListener('click', function(e) {
-			if (e.target.classList.contains('array-edit-btn')) {
-				const paramId = e.target.dataset.paramId;
-				window.openArrayEditor(paramId);
-			}
-		});
-		
-		// Event listeners for array editor
-		const arrayTypeSelect = document.getElementById('arrayTypeSelect');
-		if (arrayTypeSelect) {
-			arrayTypeSelect.addEventListener('change', updateArrayContainers);
-		}
-
 	});
 	</script>
 
