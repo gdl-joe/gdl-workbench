@@ -1,29 +1,43 @@
-
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>GDL-UI-Studio - Parameterverwaltung</title>
-	<link rel="stylesheet" href="style.css">
+	<title>GDL Workbench - Parameterverwaltung</title>
+	<link rel="stylesheet" href="style.css?v=20260128">
 	<!-- FONT AWESOME für Icons -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<script src="i18n.js"></script>
 </head>
+
 <body>
 	<div class="app-container">
-		<!-- HEADER -->
+
+		<!-- Error modal (click to dismiss) -->
+		<div id="errorModal" class="modal hidden" role="dialog" aria-modal="true">
+			<div class="modal-content">
+				<p id="errorModalMessage"></p>
+				<button id="errorModalClose" class="action-btn" data-i18n="close">Schließen</button>
+			</div>
+		</div>
 		<header class="app-header">
 			<div class="header-left">
-				<span class="logo">GDL-UI-Studio</span>
-				<span class="project-info" id="currentProjectName"></span>
-				<span class="object-info" id="currentObjectName"></span>
+				<span class="logo">GDL Workbench</span>
+				<span class="project-info" id="headerProjectName"><span data-i18n="project">Projekt</span>: -</span>
+				<span class="object-info" id="headerObjectName"><span data-i18n="object">Objekt</span>: -</span>
 			</div>
-		
+
 			<div class="header-right">
-				<button class="header-btn" id="saveBtn" title="Alle Änderungen werden automatisch gespeichert">💾 Auto-Save aktiv</button>
+				<span class="header-label" title="Alle Änderungen werden automatisch in der Datenbank gespeichert"
+					style="padding: 8px 12px; color: #a3be8c; font-size: 14px;">
+					<i class="fas fa-database"></i> <span data-i18n="auto_save_active">Auto-Save aktiv</span>
+				</span>
 				<span class="separator">|</span>
-				<button class="header-btn primary" id="generateBtn">GDL-Skripte generieren</button>
-				<button class="header-btn" id="downloadBtn">Download</button>
+				<button class="header-btn primary" id="generateBtn" title="ZIP-Download mit allen Scripts und XML"
+					data-i18n="zip_download">
+					<i class="fas fa-file-archive"></i> ZIP Download
+				</button>
 				<div class="lang-switcher">
 					<select>
 						<option value="de">Deutsch</option>
@@ -36,29 +50,42 @@
 
 		<!-- MAIN NAVIGATION -->
 		<nav class="main-nav">
-			<a href="dashboard.html" class="nav-button">Projektverwaltung</a>
-			<a href="object-selection.html" class="nav-button">Objektverwaltung</a>
-			<a href="param-management.html" class="nav-button active">Parameterverwaltung</a>
-			<a href="index.html" class="nav-button">UI Designer</a>
+			<a href="dashboard.html" class="nav-button" data-i18n="nav_dashboard">Projektverwaltung</a>
+			<a href="object-selection.html" class="nav-button" data-i18n="nav_objects">Objektverwaltung</a>
+			<a href="param-management.html" class="nav-button active" data-i18n="nav_params">Parameterverwaltung</a>
+			<a href="index.html" class="nav-button" data-i18n="nav_ui_designer">UI Designer</a>
+			<a href="script-editor.html" class="nav-button" data-i18n="nav_scripts">Skript Editor</a>
+			<a href="codeschmiede.html" class="nav-button" data-i18n="nav_codeschmiede">Codeschmiede</a>
+			<a href="build-tasks.html" class="nav-button" data-i18n="nav_build">Build Tasks</a>
 		</nav>
 
 		<!-- MAIN CONTENT AREA - Parameterverwaltung -->
 		<main class="app-main param-management-page">
 			<aside class="left-panel">
-				<h3>Aktionen</h3>
+				<h3 data-i18n="actions">Aktionen</h3>
+				<!-- XML Import auskommentiert - kann bei Bedarf wieder aktiviert werden
 				<input type="file" id="xmlFileInput" accept=".xml" style="display: none;">
-				<button class="action-btn import-xml" id="importXmlButton">XML Parameter Import</button>
-				<button class="action-btn import-csv">CSV Produktdaten Import</button>
-				<button class="action-btn">Parameter Export (XML)</button>
-				<button class="action-btn add-param">Neuen Parameter an markierten Stellen einfügen</button>
-				<button class="action-btn delete-param disabled">Ausgewählte löschen</button>
+				<label for="xmlFileInput" id="importXmlButton" class="action-btn import-xml"
+					title="Parameter aus XML importieren">
+					<i class="fas fa-file-import"></i> XML Import
+				</label>
+				-->
+				<button id="exportToFilesBtn" class="btn btn-primary"
+					title="Alle Änderungen in lokale Dateien exportieren" style="display:none;">
+					<i class="fas fa-folder-open"></i> Alle Dateien aktualisieren
+				</button>
+				<button class="action-btn add-param" data-i18n="add_param">Neuen Parameter an markierten Stellen
+					einfügen</button>
+				<button class="action-btn delete-param disabled" data-i18n="delete_selected">Ausgewählte
+					löschen</button>
 			</aside>
 
 			<section class="central-panel-table">
-				<h3>GDL-Parameterliste</h3>
+				<h3 data-i18n="param_list">GDL-Parameterliste</h3>
 				<div class="table-controls">
-					<label for="filter-param">Suchen:</label>
-					<input type="text" id="filter-param" placeholder="Parameter filtern...">
+					<label for="filter-param" data-i18n="search">Suchen:</label>
+					<input type="text" id="filter-param" data-i18n="filter_placeholder"
+						placeholder="Parameter filtern...">
 				</div>
 				<div class="param-table-container">
 					<table class="param-table">
@@ -66,109 +93,103 @@
 							<tr>
 								<th><input type="checkbox" class="select-all"></th>
 								<th></th> <!-- Drag Handle -->
-								<th title="Versteckt">X</th>
-								<th title="Eingerückt">E</th>
-								<th title="Fett">B</th>
-								<th title="Unique">U</th>
-								<th>Typ <i class="fas fa-sort-up"></i></th>
-								<th>Name <i class="fas fa-sort"></i></th>
-								<th>Beschreibung (DE) <i class="fas fa-sort"></i></th>
-								<th>Standardwert (DE) <i class="fas fa-sort"></i></th>
-								<th>UI-Seite</th>
-								<th>UI</th>
-								<th>Array</th>
+								<th title="Versteckt" data-i18n="col_hidden">X</th>
+								<th title="Eingerückt" data-i18n="col_indented">E</th>
+								<th title="Fett" data-i18n="col_bold">B</th>
+								<th title="Unique" data-i18n="col_unique">U</th>
+								<th data-i18n="col_type">Typ <i class="fas fa-sort-up"></i></th>
+								<th data-i18n="col_name">Name <i class="fas fa-sort"></i></th>
+								<th data-i18n="col_desc">Beschreibung (DE) <i class="fas fa-sort"></i></th>
+								<th data-i18n="col_default">Standardwert (DE) <i class="fas fa-sort"></i></th>
+								<th data-i18n="col_ui_page">UI-Seite</th>
+								<th data-i18n="col_ui">UI</th>
+								<th data-i18n="col_array">Array-Typ</th>
+								<th></th> <!-- Löschen Button -->
 							</tr>
 						</thead>
 						<tbody id="parameterTableBody">
 							<!-- Parameter rows will be inserted here by JavaScript -->
-							<tr><td colspan="13" style="text-align: center; color: #8899a6; padding: 15px;">Importiere eine XML-Datei, um Parameter anzuzeigen.</td></tr>
+							<tr>
+								<td colspan="14" style="text-align: center; color: #8899a6; padding: 15px;">Importiere
+									eine XML-Datei, um Parameter anzuzeigen.</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
 			</section>
 
-<aside class="right-panel">
-				<h3>Parameterdetails</h3>
-				<div class="properties-section">
-					<label>Name:</label><input type="text" name="param_name" value="">
-					<label>Typ:</label>
-					<select name="param_type">
-						<option>Length</option>
-						<option>String</option>
-						<option>Integer</option>
-						<option>Boolean</option>
-						<option>Angle</option>
-						<option>RealNum</option>
-						<option>Material</option>
-						<option>LineType</option>
-						<option>FillPattern</option>
-						<option>PenColor</option>
-						<option>Separator</option>
-						<option>Title</option>
-						<option>Dictionary</option>
-						<option>Profile</option>
-						<option>BuildingMaterial</option>
-					</select>
-					<label>Funktion:</label>
-					<select name="param_function">
-						<option>Geometrie</option>
-						<option>Produktdaten</option>
-						<option>Attribut</option>
-						<option>GDL-Intern</option>
-					</select>
-					<label>Array:</label>
-					<select name="param_array_type">
-						<option value="None">Kein Array</option>
-						<option value="1D">1-dimensionales Array</option>
-						<option value="2D">2-dimensionales Array</option>
-					</select>
-					<label><input type="checkbox" name="flag_fix_name"> FIX Name</label>
-					<label><input type="checkbox" name="flag_unique"> Unique</label>
-					<label><input type="checkbox" name="flag_bold"> Fett</label>
-					<label><input type="checkbox" name="flag_child"> Eingerückt</label>
-					<label><input type="checkbox" name="flag_hidden"> Versteckt</label>
-					<label>UI-Seite (0-99):</label><input type="number" name="param_ui_page" value="0" min="0" max="99">
-					<label>UI-Code:</label><textarea name="param_ui_code" rows="3"></textarea>
+			<aside class="right-panel">
+				<h3 data-i18n="param_details">Parameterdetails</h3>
+				<div id="parameterDetailsInfo" style="padding: 10px; color: #999; font-style: italic;"
+					data-i18n="select_param_hint">
+					Wählen Sie einen Parameter aus der Tabelle aus
 				</div>
-			
-				<h3>Mehrsprachige Details</h3>
-				<div class="properties-section language-tabs">
-					<div class="tab-buttons">
-						<button class="lang-tab active" data-lang="de">DE</button>
-						<button class="lang-tab" data-lang="en">EN</button>
-						<button class="lang-tab" data-lang="fr">FR</button>
-						<button class="lang-tab" data-lang="es">ES</button>
-						<button class="lang-tab" data-lang="it">IT</button>
+				<div id="parameterDetailsContent" style="display: none;">
+					<div class="properties-section">
+						<label style="font-weight: bold; color: #88c0d0;">VALUES</label>
+						<select name="values_type" id="valuesTypeSelect">
+							<option value="none">ohne</option>
+							<option value="VALUES">VALUES</option>
+							<option value="VALUES2">VALUES{2} ohne Bilder</option>
+							<option value="VALUES2_IMAGE">VALUES{2} mit Bilder</option>
+						</select>
+
+						<div id="valuesTextContainer" style="display: none; margin-top: 15px;">
+							<label style="font-weight: bold; color: #88c0d0;">VALUES Inhalt:</label>
+							<div id="valuesTypeHelp"
+								style="font-size: 0.85em; color: #88c0d0; margin-bottom: 5px; font-style: italic;">
+								<!-- Dynamic help text based on parameter type -->
+							</div>
+							<textarea name="values_content" id="valuesContentTextarea" rows="10"
+								placeholder="Geben Sie hier die VALUES-Werte ein..."
+								style="font-family: 'Courier New', monospace; font-size: 0.9em; width: 100%; resize: vertical; min-height: 200px;"></textarea>
+							<div id="valuesValidationError"
+								style="display: none; background-color: #bf616a; color: #fff; padding: 8px; border-radius: 4px; margin-top: 8px; font-size: 0.85em;">
+								<!-- Validation errors will appear here -->
+							</div>
+							<div id="valuesValidationSuccess"
+								style="display: none; background-color: #a3be8c; color: #2e3440; padding: 8px; border-radius: 4px; margin-top: 8px; font-size: 0.85em;">
+								✓ Alle Werte sind gültig
+							</div>
+							<div style="font-size: 0.85em; color: #888; margin-top: 8px;">
+								<strong>Hinweis:</strong> Diese Werte werden zur automatischen GDL-Script-Generierung
+								verwendet.<br>
+								<strong>Keywords:</strong> CUSTOM (letzte Zeile für benutzerdef. Werte), RANGE[min, max]
+								oder RANGE(min, max)
+							</div>
+						</div>
+
+						<!-- Image Names for VALUES2_IMAGE -->
+						<div id="valuesImageContainer"
+							style="display: none; margin-top: 15px; border-top: 1px solid #4c566a; padding-top: 15px;">
+							<label style="font-weight: bold; color: #88c0d0;">Bildnamen für VALUES{2}</label>
+							<div style="font-size: 0.85em; color: #88c0d0; margin: 5px 0; font-style: italic;">
+								Geben Sie für jede Textzeile oben den zugehörigen Bildnamen ein.
+							</div>
+							<div id="imageSelectionsGrid" style="margin-top: 10px;">
+								<!-- Image name inputs will be generated here dynamically -->
+							</div>
+						</div>
 					</div>
-					<div class="lang-content active" data-lang="de">
-						<label>Beschreibung (DE):</label><input type="text" name="desc_lang">
-						<label>Standardwert (DE):</label><input type="text" name="default_val_lang">
-						<label>VALUES (DE):</label><textarea name="values_list_lang" rows="2" placeholder="Werte komma-getrennt (z.B. 'Wert1,Wert2')"></textarea>
-						<label>UI_TOOLTIP (DE):</label><textarea name="ui_tooltip_lang" rows="2"></textarea>
+
+					<div id="radiobuttonSection" class="properties-section"
+						style="margin-top: 20px; border-top: 1px solid #4c566a; padding-top: 15px;">
+						<label style="font-weight: bold; color: #88c0d0;">Radiobutton</label>
+						<select name="radiobutton_type" id="radiobuttonTypeSelect">
+							<option value="none">ohne</option>
+							<option value="Radiobuttons">Radiobuttons</option>
+						</select>
+						<div id="radiobuttonHelp"
+							style="font-size: 0.85em; color: #88c0d0; margin-top: 5px; font-style: italic;">
+							Nur für Ganzzahl-Parameter verfügbar.
+						</div>
 					</div>
-					<div class="lang-content" data-lang="en">
-						<label>Beschreibung (EN):</label><input type="text" name="desc_lang">
-						<label>Standardwert (EN):</label><input type="text" name="default_val_lang">
-						<label>VALUES (EN):</label><textarea name="values_list_lang" rows="2" placeholder="Comma-separated values (e.g., 'Value1,Value2')"></textarea>
-						<label>UI_TOOLTIP (EN):</label><textarea name="ui_tooltip_lang" rows="2"></textarea>
-					</div>
-					<div class="lang-content" data-lang="fr">
-						<label>Beschreibung (FR):</label><input type="text" name="desc_lang">
-						<label>Standardwert (FR):</label><input type="text" name="default_val_lang">
-						<label>VALUES (FR):</label><textarea name="values_list_lang" rows="2" placeholder="Valeurs séparées par des virgules"></textarea>
-						<label>UI_TOOLTIP (FR):</label><textarea name="ui_tooltip_lang" rows="2"></textarea>
-					</div>
-					<div class="lang-content" data-lang="es">
-						<label>Beschreibung (ES):</label><input type="text" name="desc_lang">
-						<label>Standardwert (ES):</label><input type="text" name="default_val_lang">
-						<label>VALUES (ES):</label><textarea name="values_list_lang" rows="2" placeholder="Valores separados por comas"></textarea>
-						<label>UI_TOOLTIP (ES):</label><textarea name="ui_tooltip_lang" rows="2"></textarea>
-					</div>
-					<div class="lang-content" data-lang="it">
-						<label>Beschreibung (IT):</label><input type="text" name="desc_lang">
-						<label>Standardwert (IT):</label><input type="text" name="default_val_lang">
-						<label>VALUES (IT):</label><textarea name="values_list_lang" rows="2" placeholder="Valori separati da virgole"></textarea>
-						<label>UI_TOOLTIP (IT):</label><textarea name="ui_tooltip_lang" rows="2"></textarea>
+
+					<div id="valuesDisabledMessage"
+						style="display: none; padding: 10px; background-color: #4c566a; border-radius: 4px; margin-top: 15px; color: #d8dee9;">
+						<strong>⚠️ VALUES nicht verfügbar</strong><br>
+						Diese Funktion steht nicht für Parameter vom Typ <strong>TITLE</strong>,
+						<strong>SEPARATOR</strong> oder <strong>DICTIONARY</strong> zur Verfügung.
 					</div>
 				</div>
 			</aside>
@@ -182,18 +203,19 @@
 		</footer>
 	</div>
 
-<script>
+	<script>
 		document.addEventListener('DOMContentLoaded', () => {
-			const API_BASE_URL = 'http://localhost:8888/gdl-ui-studio/backend/public/api';
-			
+			const API_BASE_URL = '../backend/public/api/local';
+
 			// DOM Elements
-			const importXmlButton = document.getElementById('importXmlButton');
-			const xmlFileInput = document.getElementById('xmlFileInput');
+			// XML Import auskommentiert - kann bei Bedarf wieder aktiviert werden
+			// const importXmlButton = document.getElementById('importXmlButton');
+			// const xmlFileInput = document.getElementById('xmlFileInput');
 			const parameterTableBody = document.getElementById('parameterTableBody');
 			const statusMessage = document.getElementById('statusMessage');
 			const rowCountSpan = document.getElementById('rowCount');
 			const filterInput = document.getElementById('filter-param');
-			
+
 			// State
 			let currentProjectId = localStorage.getItem('currentProjectId');
 			let currentGdlObjectId = localStorage.getItem('currentGdlObjectId');
@@ -203,121 +225,200 @@
 			let selectedParameterIds = new Set();
 			let currentEditingParam = null;
 			let selectedRowParameterId = null;
-			let typeColors = {};
-		
+			let currentLocalFilePath = ''; // Path to local object folder
+			let typeColors = {
+				'Length': '#4a90a4',
+				'String': '#5e81ac',
+				'Integer': '#b48ead',
+				'Boolean': '#a3be8c',
+				'Angle': '#88c0d0',
+				'RealNum': '#8fbcbb',
+				'Material': '#d08770',
+				'LineType': '#b48ead',
+				'FillPattern': '#b48ead',
+				'PenColor': '#ebcb8b',
+				'Separator': '#4c566a',
+				'Title': '#81a1c1',
+				'Dictionary': '#5e81ac',
+				'Profile': '#d08770',
+				'BuildingMaterial': '#d08770'
+			};
+
 			const GDL_TYPES = [
 				'Length', 'String', 'Integer', 'Boolean', 'Angle', 'RealNum',
 				'Material', 'LineType', 'FillPattern', 'PenColor',
 				'Separator', 'Title', 'Dictionary', 'Profile', 'BuildingMaterial'
 			];
-		
-	
-		// Type colors mapping
-		const TYPE_COLORS = {
-			'Length': '#4a5568',
-			'String': '#2c5282',
-			'Integer': '#2d3748',
-			'Boolean': '#553c9a',
-			'Angle': '#38b2ac',
-			'RealNum': '#319795',
-			'Material': '#d69e2e',
-			'LineType': '#805ad5',
-			'FillPattern': '#805ad5',
-			'PenColor': '#dd6b20',
-			'Separator': '#2d3748',
-			'Title': '#2c5282',
-			'Dictionary': '#3182ce',
-			'Profile': '#dd6b20',
-			'BuildingMaterial': '#d69e2e'
-		};
+
+
 			// ===== INITIALIZATION =====
 			init();
-		
+
 			async function init() {
+				// UI-Designer-Link mit objectId versehen (gleiches Objekt in allen Browsern)
+				const uiDesignerLink = document.querySelector('.main-nav a[href="index.html"]');
+				if (uiDesignerLink) {
+					uiDesignerLink.href = currentGdlObjectId
+						? `index.html?objectId=${encodeURIComponent(currentGdlObjectId)}`
+						: 'index.html';
+				}
+
 				setupEventListeners();
-				
+
+				// Load type colors from backend
+				await loadTypeColors();
+
 				// Load object info and parameters from localStorage
 				if (currentGdlObjectId) {
+					// AUTO-IMPORT: If ID is base64 encoded (local file path), import to database first
+					const isBase64Id = /^[A-Za-z0-9+/=]+$/.test(currentGdlObjectId) && currentGdlObjectId.length > 20;
+
+					if (isBase64Id) {
+						try {
+							showMessage('Importiere lokales Objekt in Datenbank...', 'info');
+
+							// Decode base64 to get file path
+							let objectPath = currentGdlObjectId;
+							try {
+								objectPath = atob(currentGdlObjectId);
+							} catch (e) {
+								console.error('Failed to decode base64 ID:', e);
+							}
+
+							// Import object to database via LocalController
+							const importResponse = await fetch(`${API_BASE_URL}/objects/import`, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ object_path: objectPath })
+							});
+
+							const importResult = await importResponse.json();
+
+							if (importResult.success && importResult.data && importResult.data.object_id) {
+								// Update to use database ID
+								currentGdlObjectId = importResult.data.object_id;
+								localStorage.setItem('currentGdlObjectId', currentGdlObjectId);
+								showMessage('Objekt erfolgreich importiert', 'success');
+							} else {
+								throw new Error(importResult.error || 'Import fehlgeschlagen');
+							}
+						} catch (error) {
+							console.error('Auto-import error:', error);
+							showMessage('Fehler beim Auto-Import: ' + error.message, 'error');
+							return; // Stop initialization if import fails
+						}
+					}
+
 					await loadObjectInfo(currentGdlObjectId);
 					await loadParameters(currentGdlObjectId);
 				} else {
 					showMessage('Kein Objekt ausgewählt. Bitte navigieren Sie über das Dashboard.', 'warning');
 				}
 			}
-		
+
+
+			// ===== LOAD TYPE COLORS =====
+			async function loadTypeColors() {
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameter-type-colors`);
+					const result = await response.json();
+
+					if (response.ok && result.success) {
+						// Normalize type names: convert uppercase from DB to mixed case used in frontend
+						const loadedColors = result.data || {};
+
+						// Map DB uppercase types to frontend mixed case types
+						const typeNameMap = {
+							'STRING': 'String',
+							'INTEGER': 'Integer',
+							'LENGTH': 'Length',
+							'ANGLE': 'Angle',
+							'BOOLEAN': 'Boolean',
+							'MATERIAL': 'Material',
+							'FILL': 'FillPattern',
+							'PEN': 'PenColor',
+							'STYLE': 'LineType',
+							'REAL': 'RealNum'
+						};
+
+						// Merge loaded colors (with normalized names) with defaults
+						for (const [dbType, frontendType] of Object.entries(typeNameMap)) {
+							if (loadedColors[dbType]) {
+								typeColors[frontendType] = loadedColors[dbType];
+							}
+						}
+
+						// Also keep any direct matches (for types that might already be in correct case)
+						for (const [key, value] of Object.entries(loadedColors)) {
+							if (GDL_TYPES.includes(key)) {
+								typeColors[key] = value;
+							}
+						}
+
+						console.log('Type colors loaded and normalized:', typeColors);
+					} else {
+						console.warn('Could not load type colors, using defaults');
+					}
+				} catch (error) {
+					console.warn('Error loading type colors:', error);
+				}
+			}
+
 			// ===== EVENT LISTENERS =====
 			function setupEventListeners() {
-				// Import XML
-				importXmlButton.addEventListener('click', () => {
-					if (!currentGdlObjectId) {
-						alert('Bitte wählen Sie zuerst ein Objekt über das Dashboard.');
-						return;
-					}
-					xmlFileInput.click();
-				});
-				xmlFileInput.addEventListener('change', handleXmlImport);
-		
+				// XML Import auskommentiert - kann bei Bedarf wieder aktiviert werden
+				// if (importXmlButton && xmlFileInput) {
+				// 	importXmlButton.addEventListener('click', () => {
+				// 		if (!currentGdlObjectId) {
+				// 			alert('Bitte wählen Sie zuerst ein Objekt über das Dashboard.');
+				// 			return;
+				// 		}
+				// 		xmlFileInput.click();
+				// 	});
+				// 	xmlFileInput.addEventListener('change', handleXmlImport);
+				// }
+
 				// Header buttons
 				document.getElementById('generateBtn')?.addEventListener('click', () => {
 					if (currentGdlObjectId) {
-						exportXml(currentGdlObjectId);
+						exportZip(currentGdlObjectId);
 					} else {
 						alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
 					}
 				});
-		
-				document.getElementById('downloadBtn')?.addEventListener('click', () => {
-					if (currentGdlObjectId) {
-						exportXml(currentGdlObjectId);
-					} else {
-						alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
-					}
-				});
-		
+
+
 				document.getElementById('saveBtn')?.addEventListener('click', () => {
 					alert('Alle Änderungen werden automatisch gespeichert.');
 				});
-		
+
 				// Left panel action buttons
-				const actionButtons = document.querySelectorAll('.action-btn');
-				actionButtons.forEach(btn => {
-					const text = btn.textContent.trim();
-					if (text === 'Parameter Export (XML)') {
-						btn.addEventListener('click', () => {
-							if (currentGdlObjectId) {
-								exportXml(currentGdlObjectId);
-							} else {
-								alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
-							}
-						});
-					} else if (text === 'Neuen Parameter an markierten Stellen einfügen') {
-						btn.addEventListener('click', showAddParameterDialog);
-					} else if (text === 'Ausgewählte löschen') {
-						btn.addEventListener('click', deleteSelectedParameters);
-					}
-				});
-		
+				document.querySelector('.action-btn.add-param')
+					?.addEventListener('click', showAddParameterDialog);
+				document.querySelector('.action-btn.delete-param')
+					?.addEventListener('click', deleteSelectedParameters);
+
 				// Filter
 				if (filterInput) {
 					filterInput.addEventListener('input', filterParameters);
 				}
-		
+
 				// Language tabs
 				setupLanguageTabs();
-				
+
 				// Right panel listeners
 				setupRightPanelListeners();
 			}
-		
+
 			function setupLanguageTabs() {
 				const langTabs = document.querySelectorAll('.language-tabs .lang-tab');
 				const langContents = document.querySelectorAll('.language-tabs .lang-content');
-		
+
 				langTabs.forEach(tab => {
 					tab.addEventListener('click', () => {
 						langTabs.forEach(t => t.classList.remove('active'));
 						tab.classList.add('active');
-		
+
 						const targetLang = tab.dataset.lang;
 						langContents.forEach(content => {
 							content.classList.toggle('active', content.dataset.lang === targetLang);
@@ -325,45 +426,722 @@
 					});
 				});
 			}
-		
+
 			function setupRightPanelListeners() {
-				const rightPanel = document.querySelector('.right-panel');
-				
-				rightPanel.querySelectorAll('input, select, textarea').forEach(element => {
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				const valuesTextContainer = document.getElementById('valuesTextContainer');
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+				const radiobuttonTypeSelect = document.getElementById('radiobuttonTypeSelect');
+
+				// Radiobutton type select change
+				if (radiobuttonTypeSelect) {
+					radiobuttonTypeSelect.addEventListener('change', () => {
+						if (currentEditingParam) {
+							updateParameterFromRightPanel();
+						}
+					});
+				}
+
+				// VALUES type dropdown change
+				if (valuesTypeSelect) {
+					valuesTypeSelect.addEventListener('change', (e) => {
+						const selectedValue = e.target.value;
+						const valuesImageContainer = document.getElementById('valuesImageContainer');
+
+						// Show/hide textarea based on selection
+						if (selectedValue === 'VALUES' || selectedValue === 'VALUES2' || selectedValue === 'VALUES2_IMAGE') {
+							valuesTextContainer.style.display = 'block';
+							updateValuesTypeHelp();
+							// Validate immediately
+							if (currentEditingParam) {
+								validateValuesContent();
+							}
+						} else {
+							valuesTextContainer.style.display = 'none';
+							clearValidationMessages();
+						}
+
+						// Show/hide image settings for VALUES2_IMAGE
+						if (selectedValue === 'VALUES2_IMAGE') {
+							if (valuesImageContainer) {
+								valuesImageContainer.style.display = 'block';
+								generateImageSelections();
+							}
+						} else {
+							if (valuesImageContainer) {
+								valuesImageContainer.style.display = 'none';
+							}
+						}
+
+						// Save dropdown change WITHOUT reload
+						if (currentEditingParam) {
+							saveValuesDataOnly();
+						}
+					});
+				}
+
+				// VALUES content textarea change (with debounce for validation and save)
+				if (valuesContentTextarea) {
+					let validationTimeout;
 					let saveTimeout;
-					element.addEventListener('change', () => {
+					let imageUpdateTimeout;
+
+					valuesContentTextarea.addEventListener('input', () => {
+						// Validation with 2 second debounce
+						clearTimeout(validationTimeout);
+						validationTimeout = setTimeout(() => {
+							if (currentEditingParam) {
+								validateValuesContent();
+							}
+						}, 2000);
+
+						// Regenerate image selections if VALUES2_IMAGE is active
+						clearTimeout(imageUpdateTimeout);
+						imageUpdateTimeout = setTimeout(() => {
+							const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+							if (valuesTypeSelect && valuesTypeSelect.value === 'VALUES2_IMAGE') {
+								generateImageSelections();
+							}
+						}, 500);
+
+						// Save with 3 second debounce (with reload to update table dropdowns)
 						clearTimeout(saveTimeout);
 						saveTimeout = setTimeout(() => {
 							if (currentEditingParam) {
 								updateParameterFromRightPanel();
 							}
-						}, 500);
+						}, 3000);
 					});
-				});
+				}
+
+				// Button Listeners
+				// Export to Files button (only for local-synced objects)
+				const btnExportToFiles = document.getElementById('exportToFilesBtn');
+				if (btnExportToFiles) {
+					btnExportToFiles.addEventListener('click', async () => {
+						if (!currentGdlObjectId) {
+							alert('Kein Objekt geladen');
+							return;
+						}
+
+						if (confirm('Möchten Sie die Änderungen in die lokalen Dateien exportieren?')) {
+							try {
+								showMessage('Exportiere in Dateien...', 'info');
+
+								// Use either the numeric ID or a path-based ID if needed
+								// The route /local/objects/{id}/export supports the numeric DB ID
+								const response = await fetch(`${API_BASE_URL}/objects/${currentGdlObjectId}/export`, {
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									}
+								});
+
+								if (response.status === 405) {
+									throw new Error('Server erlaubt keine POST-Anfrage. Bitte Route prüfen.');
+								}
+
+								const result = await response.json();
+
+								if (result.success) {
+									showMessage('Export erfolgreich!', 'success');
+								} else {
+									showMessage('Export fehlgeschlagen: ' + (result.error || 'Unbekannter Fehler'), 'error');
+								}
+							} catch (error) {
+								showMessage('Fehler beim Export: ' + error.message, 'error');
+								console.error('Export error:', error);
+							}
+						}
+					});
+				}
 			}
-		
+
 			// ===== UTILITY FUNCTIONS =====
 			function showMessage(message, type = 'info') {
 				if (statusMessage) {
-					statusMessage.textContent = 'Status: ' + message;
+					const translation = window.i18n ? window.i18n.t(message) : message;
+					statusMessage.textContent = (window.i18n ? window.i18n.t('status_prefix') : 'Status: ') + translation;
 				}
 				console.log('[' + type + '] ' + message);
 			}
-			
+
+			// ===== VALUES VALIDATION =====
+
+			// Parameter types that accept only integers
+			const INTEGER_TYPES = ['Integer', 'PenColor', 'LineType', 'FillPattern', 'Material', 'BuildingMaterial', 'Profile'];
+			// Parameter types that accept decimals
+			const DECIMAL_TYPES = ['Length', 'RealNum', 'Angle'];
+			// Parameter types that accept strings
+			const STRING_TYPES = ['String'];
+
+			function getValueTypeForParameter(gdlType) {
+				if (INTEGER_TYPES.includes(gdlType)) return 'integer';
+				if (DECIMAL_TYPES.includes(gdlType)) return 'decimal';
+				if (STRING_TYPES.includes(gdlType)) return 'string';
+				return 'unknown';
+			}
+
+			function updateValuesTypeHelp() {
+				if (!currentEditingParam) return;
+
+				const helpDiv = document.getElementById('valuesTypeHelp');
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				if (!helpDiv || !valuesTypeSelect) return;
+
+				const valuesType = valuesTypeSelect.value;
+				const paramType = currentEditingParam.gdl_type;
+				const valueType = getValueTypeForParameter(paramType);
+
+				let helpText = '';
+
+				if (valuesType === 'VALUES') {
+					if (valueType === 'integer') {
+						helpText = `📋 ${paramType}: ${window.i18n.t('help_integer')}`;
+					} else if (valueType === 'decimal') {
+						helpText = `📋 ${paramType}: ${window.i18n.t('help_decimal')}`;
+					} else if (valueType === 'string') {
+						helpText = `📋 ${paramType}: ${window.i18n.t('help_string')}`;
+					}
+				} else if (valuesType === 'VALUES2' || valuesType === 'VALUES2_IMAGE') {
+					if (paramType === 'Integer') {
+						if (valuesType === 'VALUES2_IMAGE') {
+							helpText = `📋 ${window.i18n.t('help_v2_img')}`;
+						} else {
+							helpText = `📋 ${window.i18n.t('help_v2')}`;
+						}
+					} else {
+						helpText = `⚠️ ${window.i18n.t('err_v2_only_integer')}`;
+					}
+				}
+
+				helpDiv.textContent = helpText;
+			}
+
+			function parseRANGE(rangeStr) {
+				// RANGE[min, max] or RANGE(min, max)
+				const match = rangeStr.match(/^RANGE\s*([[(])\s*([^,]+)\s*,\s*([^\])]+)\s*([\])])$/);
+				if (!match) return null;
+
+				const [, openBracket, minStr, maxStr, closeBracket] = match;
+				const min = parseFloat(minStr.trim());
+				const max = parseFloat(maxStr.trim());
+
+				if (isNaN(min) || isNaN(max)) return null;
+
+				return {
+					min,
+					max,
+					includeMin: openBracket === '[',
+					includeMax: closeBracket === ']'
+				};
+			}
+
+			function validateValuesContent() {
+				if (!currentEditingParam) return true;
+
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				const errorDiv = document.getElementById('valuesValidationError');
+				const successDiv = document.getElementById('valuesValidationSuccess');
+
+				if (!valuesContentTextarea || !valuesTypeSelect || !errorDiv || !successDiv) return true;
+
+				const valuesType = valuesTypeSelect.value;
+				if (valuesType === 'none') {
+					clearValidationMessages();
+					return true;
+				}
+
+				const content = valuesContentTextarea.value;
+				const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+				if (lines.length === 0) {
+					clearValidationMessages();
+					return true;
+				}
+
+				const paramType = currentEditingParam.gdl_type;
+				const valueType = getValueTypeForParameter(paramType);
+				const errors = [];
+
+				if (valuesType === 'VALUES2' || valuesType === 'VALUES2_IMAGE') {
+					// VALUES{2} validation
+					if (paramType !== 'Integer') {
+						showValidationError('VALUES{2} ist nur für INTEGER-Parameter erlaubt!');
+						return false;
+					}
+
+					// All lines must be strings (no special keywords for VALUES{2})
+					lines.forEach((line, idx) => {
+						if (line === 'CUSTOM' || line.startsWith('RANGE')) {
+							errors.push(`Zeile ${idx + 1}: CUSTOM und RANGE sind bei VALUES{2} nicht erlaubt`);
+						}
+					});
+
+				} else if (valuesType === 'VALUES') {
+					// VALUES validation
+					let hasCustom = false;
+					let customLineIdx = -1;
+
+					lines.forEach((line, idx) => {
+						const lineNum = idx + 1;
+
+						// Check for CUSTOM keyword
+						if (line === 'CUSTOM') {
+							if (valueType === 'string') {
+								errors.push(`Zeile ${lineNum}: CUSTOM ist bei String-Parametern nicht erlaubt`);
+							} else if (hasCustom) {
+								errors.push(`Zeile ${lineNum}: CUSTOM darf nur einmal vorkommen`);
+							} else if (idx !== lines.length - 1) {
+								errors.push(`Zeile ${lineNum}: CUSTOM muss in der letzten Zeile stehen`);
+							} else {
+								hasCustom = true;
+								customLineIdx = idx;
+							}
+							return;
+						}
+
+						// Check for RANGE keyword
+						if (line.startsWith('RANGE')) {
+							if (valueType === 'string') {
+								errors.push(`Zeile ${lineNum}: RANGE ist bei String-Parametern nicht erlaubt`);
+								return;
+							}
+
+							const rangeData = parseRANGE(line);
+							if (!rangeData) {
+								errors.push(`Zeile ${lineNum}: Ungültiges RANGE-Format. Erwartet: RANGE[min, max] oder RANGE(min, max)`);
+								return;
+							}
+
+							if (rangeData.min >= rangeData.max) {
+								errors.push(`Zeile ${lineNum}: RANGE min (${rangeData.min}) muss kleiner als max (${rangeData.max}) sein`);
+								return;
+							}
+
+							if (valueType === 'integer') {
+								if (!Number.isInteger(rangeData.min) || !Number.isInteger(rangeData.max)) {
+									errors.push(`Zeile ${lineNum}: RANGE bei ${paramType} muss Ganzzahlen enthalten`);
+								}
+							}
+							return;
+						}
+
+						// Validate actual values
+						if (valueType === 'integer') {
+							const num = parseFloat(line);
+							if (isNaN(num)) {
+								errors.push(`Zeile ${lineNum}: "${line}" ist keine gültige Zahl`);
+							} else if (!Number.isInteger(num)) {
+								errors.push(`Zeile ${lineNum}: "${line}" muss eine Ganzzahl sein (${paramType})`);
+							}
+						} else if (valueType === 'decimal') {
+							const num = parseFloat(line);
+							if (isNaN(num)) {
+								errors.push(`Zeile ${lineNum}: "${line}" ist keine gültige Zahl`);
+							}
+						} else if (valueType === 'string') {
+							// Strings are always valid, but check for quotes
+							if (line.startsWith('"') || line.startsWith("'")) {
+								errors.push(`Zeile ${lineNum}: Strings ohne Anführungszeichen eingeben`);
+							}
+						}
+					});
+				}
+
+				// Show results
+				if (errors.length > 0) {
+					showValidationError(errors.join('<br>'));
+					return false;
+				} else {
+					showValidationSuccess();
+					return true;
+				}
+			}
+
+			function showValidationError(message) {
+				const errorDiv = document.getElementById('valuesValidationError');
+				const successDiv = document.getElementById('valuesValidationSuccess');
+				if (errorDiv) {
+					errorDiv.innerHTML = '❌ ' + message;
+					errorDiv.style.display = 'block';
+				}
+				if (successDiv) {
+					successDiv.style.display = 'none';
+				}
+			}
+
+			function showValidationSuccess() {
+				const errorDiv = document.getElementById('valuesValidationError');
+				const successDiv = document.getElementById('valuesValidationSuccess');
+				if (errorDiv) {
+					errorDiv.style.display = 'none';
+				}
+				if (successDiv) {
+					successDiv.style.display = 'block';
+				}
+			}
+
+			function clearValidationMessages() {
+				const errorDiv = document.getElementById('valuesValidationError');
+				const successDiv = document.getElementById('valuesValidationSuccess');
+				if (errorDiv) errorDiv.style.display = 'none';
+				if (successDiv) successDiv.style.display = 'none';
+			}
+
+			// ===== IMAGE NAMES FOR VALUES2_IMAGE =====
+			function generateImageSelections() {
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+				const imageSelectionsGrid = document.getElementById('imageSelectionsGrid');
+
+				if (!valuesContentTextarea || !imageSelectionsGrid) return;
+
+				const content = valuesContentTextarea.value;
+				const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+				imageSelectionsGrid.innerHTML = '';
+
+				if (lines.length === 0) {
+					imageSelectionsGrid.innerHTML = '<div style="color: #888; font-style: italic;">Geben Sie zuerst Textzeilen oben ein.</div>';
+					return;
+				}
+
+				// Generate image name input for each line
+				lines.forEach((line, i) => {
+					const div = document.createElement('div');
+					div.style.cssText = 'margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; display: flex; align-items: center; gap: 10px;';
+
+					div.innerHTML = `
+						<label style="font-weight: bold; min-width: 30px;">${i + 1}.</label>
+						<label style="flex: 1; color: #88c0d0;">${line}</label>
+						<input type="text" 
+							class="image-name-input" 
+							data-index="${i}" 
+							placeholder="z.B. gully_mat" 
+							style="flex: 2; padding: 6px;">
+						<button class="btn btn-secondary" onclick="selectImageForIndex(${i})" style="padding: 6px 12px;">
+							<i class="fas fa-image"></i>
+						</button>
+					`;
+
+					imageSelectionsGrid.appendChild(div);
+				});
+
+				// Load existing image names if available
+				if (currentEditingParam && currentEditingParam.ui_code) {
+					try {
+						let valuesData;
+						if (typeof currentEditingParam.ui_code === 'string') {
+							valuesData = JSON.parse(currentEditingParam.ui_code);
+						} else {
+							valuesData = currentEditingParam.ui_code;
+						}
+
+						if (valuesData.images && Array.isArray(valuesData.images)) {
+							valuesData.images.forEach((imgName, idx) => {
+								const input = document.querySelector(`.image-name-input[data-index="${idx}"]`);
+								if (input) {
+									input.value = imgName || '';
+								}
+							});
+						}
+					} catch (e) {
+						console.error('Error loading image names:', e);
+					}
+				}
+
+				// Add event listeners to all image name inputs
+				document.querySelectorAll('.image-name-input').forEach(input => {
+					input.addEventListener('change', () => {
+						if (currentEditingParam) {
+							saveValuesDataOnly();
+						}
+					});
+				});
+			}
+
+			// Image selection dialog
+			window.selectImageForIndex = async function (index) {
+				console.log('selectImageForIndex called with index:', index);
+				console.log('currentProjectId:', currentProjectId);
+				console.log('currentGdlObjectId:', currentGdlObjectId);
+
+				if (!currentProjectId) {
+					alert('Kein Projekt geladen.\n\nBitte laden Sie zuerst ein Objekt aus einem Projekt.\n\nAktueller Status:\n- Projekt-ID: ' + (currentProjectId || 'nicht gesetzt') + '\n- Objekt-ID: ' + (currentGdlObjectId || 'nicht gesetzt'));
+					return;
+				}
+
+				try {
+					// Load images from Makros folder
+					const url = `${API_BASE_URL}/images/makros?projectId=${encodeURIComponent(currentProjectId)}`;
+					console.log('Loading images from:', url);
+
+					const response = await fetch(url);
+					const result = await response.json();
+
+					console.log('Images response:', result);
+
+					if (!response.ok || !result.success) {
+						alert('Fehler beim Laden der Bilder aus dem Makros-Ordner.');
+						return;
+					}
+
+					const images = result.data || [];
+					if (images.length === 0) {
+						alert('Keine Bilder im Makros-Ordner gefunden.\n\nPfad: ' + currentProjectId + '/01_gsms/gdl-ui-studio/Makros');
+						return;
+					}
+
+					// Show selection dialog
+					const selectedImage = await showImageSelectionDialog(images, currentProjectId);
+					if (selectedImage) {
+						// Set the selected image in the input field
+						const input = document.querySelector(`.image-name-input[data-index="${index}"]`);
+						if (input) {
+							input.value = selectedImage;
+							// Trigger save
+							if (currentEditingParam) {
+								saveValuesDataOnly();
+							}
+						}
+					}
+				} catch (error) {
+					console.error('Error loading images:', error);
+					alert('Fehler beim Laden der Bilder: ' + error.message);
+				}
+			};
+
+			// Show image selection dialog
+			function showImageSelectionDialog(images, projectId) {
+				return new Promise((resolve) => {
+					// Create modal overlay
+					const overlay = document.createElement('div');
+					overlay.style.cssText = `
+						position: fixed;
+						top: 0;
+						left: 0;
+						right: 0;
+						bottom: 0;
+						background: rgba(0, 0, 0, 0.7);
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						z-index: 10000;
+					`;
+
+					// Create dialog
+					const dialog = document.createElement('div');
+					dialog.style.cssText = `
+						background: #2e3440;
+						border-radius: 8px;
+						padding: 20px;
+						max-width: 800px;
+						max-height: 80vh;
+						overflow: auto;
+						box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+					`;
+
+					// Dialog header
+					const header = document.createElement('h3');
+					header.textContent = 'Bild auswählen';
+					header.style.cssText = 'color: #88c0d0; margin-top: 0;';
+					dialog.appendChild(header);
+
+					// Image grid
+					const grid = document.createElement('div');
+					grid.style.cssText = `
+						display: grid;
+						grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+						gap: 10px;
+						margin-top: 15px;
+					`;
+
+					images.forEach(imageName => {
+						const imageCard = document.createElement('div');
+						imageCard.style.cssText = `
+							border: 2px solid #4c566a;
+							border-radius: 4px;
+							padding: 8px;
+							cursor: pointer;
+							transition: all 0.2s;
+							background: #3b4252;
+							text-align: center;
+						`;
+						imageCard.onmouseover = () => {
+							imageCard.style.borderColor = '#88c0d0';
+							imageCard.style.backgroundColor = '#434c5e';
+						};
+						imageCard.onmouseout = () => {
+							imageCard.style.borderColor = '#4c566a';
+							imageCard.style.backgroundColor = '#3b4252';
+						};
+
+						const img = document.createElement('img');
+						img.src = `${API_BASE_URL}/images/makros/serve?projectId=${encodeURIComponent(projectId)}&image=${encodeURIComponent(imageName)}`;
+						img.style.cssText = 'width: 100%; height: 80px; object-fit: contain; display: block;';
+						img.onerror = () => {
+							img.style.display = 'none';
+							imageCard.textContent = imageName;
+							imageCard.style.fontSize = '11px';
+							imageCard.style.color = '#d8dee9';
+						};
+
+						const label = document.createElement('div');
+						label.textContent = imageName;
+						label.style.cssText = 'font-size: 10px; color: #d8dee9; margin-top: 5px; word-break: break-all;';
+
+						imageCard.appendChild(img);
+						imageCard.appendChild(label);
+
+						imageCard.onclick = () => {
+							document.body.removeChild(overlay);
+							resolve(imageName);
+						};
+
+						grid.appendChild(imageCard);
+					});
+
+					dialog.appendChild(grid);
+
+					// Cancel button
+					const cancelBtn = document.createElement('button');
+					cancelBtn.textContent = 'Abbrechen';
+					cancelBtn.style.cssText = `
+						margin-top: 15px;
+						padding: 8px 16px;
+						background: #4c566a;
+						color: #d8dee9;
+						border: none;
+						border-radius: 4px;
+						cursor: pointer;
+					`;
+					cancelBtn.onclick = () => {
+						document.body.removeChild(overlay);
+						resolve(null);
+					};
+					dialog.appendChild(cancelBtn);
+
+					overlay.appendChild(dialog);
+					document.body.appendChild(overlay);
+
+					// Close on overlay click
+					overlay.onclick = (e) => {
+						if (e.target === overlay) {
+							document.body.removeChild(overlay);
+							resolve(null);
+						}
+					};
+				});
+			}
+
+			// Extract VALUES list from parameter for dropdown generation
+			function getValuesListForParameter(param) {
+				if (!param.ui_code) return null;
+
+				try {
+					let valuesData;
+					if (param.ui_code.trim().startsWith('{')) {
+						valuesData = JSON.parse(param.ui_code);
+					} else {
+						// Legacy format or not JSON
+						return null;
+					}
+
+					if (!valuesData.type || valuesData.type === 'none') return null;
+					if (!valuesData.content || valuesData.content.trim() === '') return null;
+
+					const lines = valuesData.content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+					if (lines.length === 0) return null;
+
+					const result = {
+						type: valuesData.type,
+						values: [],
+						hasCustom: false,
+						ranges: []
+					};
+
+					// VALUES2 and VALUES2_IMAGE both create text dropdowns in the table
+					if (valuesData.type === 'VALUES2' || valuesData.type === 'VALUES2_IMAGE') {
+						// VALUES{2}: lines are strings, numbered from 1
+						lines.forEach((line, idx) => {
+							result.values.push({
+								display: line,
+								value: idx + 1
+							});
+						});
+					} else if (valuesData.type === 'VALUES') {
+						// VALUES: check for CUSTOM and RANGE
+						lines.forEach(line => {
+							if (line === 'CUSTOM') {
+								result.hasCustom = true;
+							} else if (line.startsWith('RANGE')) {
+								const rangeData = parseRANGE(line);
+								if (rangeData) {
+									result.ranges.push(rangeData);
+								}
+							} else {
+								// Regular value
+								result.values.push({
+									display: line,
+									value: line
+								});
+							}
+						});
+					}
+
+					return result;
+				} catch (e) {
+					return null;
+				}
+			}
+
 			async function loadObjectInfo(objectId) {
 				try {
 					showMessage('Lade Objektinformationen...', 'info');
-					const response = await fetch(`${API_BASE_URL}/gdl-objects/${objectId}`);
+
+					if (!objectId) {
+						console.warn('loadObjectInfo: No objectId provided');
+						return;
+					}
+
+					// All objects now use database IDs (local files are imported first)
+					const url = `${API_BASE_URL}/gdl-objects/${objectId}`;
+
+					const response = await fetch(url);
 					const result = await response.json();
-					
+
 					if (response.ok && result.success) {
 						const obj = result.data;
 						currentGdlObjectName = obj.name;
 						currentProjectId = obj.project_id;
-						
-						const objectNameEl = document.getElementById('currentObjectName');
-						if (objectNameEl) objectNameEl.textContent = 'Objekt: ' + obj.name;
-						
+
+						// Save to localStorage for persistence
+						if (currentProjectId) {
+							localStorage.setItem('currentProjectId', currentProjectId);
+						}
+
+						console.log('Loaded object info:', {
+							name: obj.name,
+							project_id: currentProjectId,
+							id: objectId
+						});
+
+						document.getElementById('headerObjectName').textContent = 'Objekt: ' + obj.name;
+						if (currentProjectId) {
+							const projectName = String(currentProjectId).split('/').pop() || 'Unbekanntes Projekt';
+							document.getElementById('headerProjectName').textContent = 'Projekt: ' + projectName;
+						} else {
+							console.warn('No project_id in object data!');
+						}
+
+						// Show/hide export button based on is_local_sync flag
+						const exportBtn = document.getElementById('exportToFilesBtn');
+						if (exportBtn) {
+							exportBtn.style.display = obj.is_local_sync ? 'inline-flex' : 'none';
+						}
+						currentLocalFilePath = obj.local_file_path || '';
+
 						showMessage('Objekt "' + obj.name + '" geladen', 'success');
 					} else {
 						showMessage('Fehler beim Laden der Objektinformationen', 'error');
@@ -374,118 +1152,189 @@
 					console.error('Error loading object info:', error);
 				}
 			}
-		
+
 			// ===== XML IMPORT =====
 			async function handleXmlImport(event) {
 				const file = event.target.files[0];
 				if (!file) return;
-		
+
+				console.log('XML Import gestartet:', file.name);
+
 				// Automatischer Objektname aus Dateinamen
 				const objectName = file.name.replace('.xml', '').replace('_Param', '').replace('Parameters', '') + '.gsm';
-		
-				statusMessage.textContent = 'Status: XML-Datei wird gelesen...';
-		
+
+				if (statusMessage) {
+					statusMessage.textContent = 'Status: XML-Datei wird gelesen...';
+				}
+
 				const reader = new FileReader();
 				reader.onload = async (e) => {
 					const xmlContent = e.target.result;
-		
-					statusMessage.textContent = 'Status: Parameter werden importiert...';
-		
+
+					if (statusMessage) {
+						statusMessage.textContent = 'Status: Parameter werden importiert...';
+					}
+					console.log('XML Content length:', xmlContent.length);
+
 					try {
 						const response = await fetch(`${API_BASE_URL}/parameters/import`, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
 								xml_content: xmlContent,
+								gdl_object_id: currentGdlObjectId,
 								project_id: currentProjectId,
-								object_name: objectName,
+								object_name: objectName
 							}),
 						});
-		
+
+						console.log('Import Response Status:', response.status);
 						const result = await response.json();
-		
-						if (response.ok) {
-							statusMessage.textContent = `Status: ${result.message}`;
-							await loadObjects(currentProjectId);
-							objectSelector.value = result.gdlObjectId;
-							objectSelector.dispatchEvent(new Event('change'));
+						console.log('Import Result:', result);
+
+						if (response.ok || result.success) {
+							if (statusMessage) {
+								statusMessage.textContent = `Status: ${result.message || 'Import erfolgreich'}`;
+							}
+							// Update current object ID if a new object was created
+							if (result.gdlObjectId) {
+								currentGdlObjectId = result.gdlObjectId;
+								localStorage.setItem('currentGdlObjectId', currentGdlObjectId);
+							}
+							// Reload object info and parameters
+							await loadObjectInfo(currentGdlObjectId);
+							await loadParameters(currentGdlObjectId);
 						} else {
-							statusMessage.textContent = `Fehler: ${result.error || 'Unbekannter Fehler'}`;
+							const errorMsg = `Fehler: ${result.error || result.message || 'Unbekannter Fehler'}`;
+							if (statusMessage) {
+								statusMessage.textContent = errorMsg;
+							}
 							console.error('Import failed:', result);
+							alert(errorMsg);
 						}
 					} catch (error) {
-						statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+						const errorMsg = `Netzwerkfehler: ${error.message}`;
+						if (statusMessage) {
+							statusMessage.textContent = errorMsg;
+						}
 						console.error('Network error:', error);
+						alert(errorMsg);
 					}
-					
-					xmlFileInput.value = '';
+
+					// XML Import auskommentiert
+					// if (xmlFileInput) {
+					// 	xmlFileInput.value = '';
+					// }
 				};
 				reader.readAsText(file);
 			}
-		
+
 			// ===== LOAD PARAMETERS =====
 			async function loadParameters(objectId) {
 				if (!objectId) {
+					console.warn('loadParameters: No objectId provided');
 					clearParameterTable();
 					return;
 				}
-		
+
 				statusMessage.textContent = 'Status: Parameter werden geladen...';
-				
+
 				try {
-					const response = await fetch(`${API_BASE_URL}/objects/${objectId}/parameters`);
-					const data = await response.json();
-		
-					if (response.ok) {
-						currentGdlObjectName = data.object_name || '';
-						allParameters = data.data || [];
+					// All objects now use database IDs (local files are imported first)
+					const url = `${API_BASE_URL}/objects/${objectId}/parameters`;
+					const response = await fetch(url);
+					const result = await response.json();
+
+					console.log('API Response:', result); // DEBUG
+
+					if (response.ok && result.success) {
+						// ResponseHelper wraps data in result.data
+						const responseData = result.data || {};
+
+						// Handle both nested and flat structures
+						if (Array.isArray(responseData.data)) {
+							// New format: { success: true, data: [...], object_name: "..." }
+							allParameters = responseData.data;
+							currentGdlObjectName = responseData.object_name || '';
+						} else if (Array.isArray(responseData)) {
+							// Flat format: { success: true, data: [...] }
+							allParameters = responseData;
+							currentGdlObjectName = result.object_name || '';
+						} else {
+							// Fallback
+							allParameters = [];
+							console.error('Unexpected data structure:', result);
+						}
+
+						console.log('Loaded parameters:', allParameters.length); // DEBUG
+
 						renderParameters();
+
+						// Sync currentEditingParam with the new list to keep references fresh
+						if (currentEditingParam) {
+							const freshParam = allParameters.find(p => p.id === currentEditingParam.id);
+							if (freshParam) {
+								currentEditingParam = freshParam;
+								// Re-apply selection class in UI
+								const row = document.querySelector(`tr[data-parameter-id="${currentEditingParam.id}"]`);
+								if (row) row.classList.add('selected');
+							} else {
+								// Parameter no longer exists, clear selection
+								currentEditingParam = null;
+								selectedRowParameterId = null;
+								const paramDetailsInfo = document.getElementById('parameterDetailsInfo');
+								const paramDetailsContent = document.getElementById('parameterDetailsContent');
+								if (paramDetailsInfo) paramDetailsInfo.style.display = 'block';
+								if (paramDetailsContent) paramDetailsContent.style.display = 'none';
+							}
+						}
+
 						statusMessage.textContent = 'Status: Parameter erfolgreich geladen.';
 					} else {
-						statusMessage.textContent = `Fehler beim Laden: ${data.error || 'Unbekannter Fehler'}`;
-						console.error('Failed to load parameters:', data);
+						const errorMsg = result.error || 'Unbekannter Fehler';
+						statusMessage.textContent = `Fehler beim Laden: ${errorMsg}`;
+						console.error('Failed to load parameters:', result);
+						clearParameterTable();
 					}
 				} catch (error) {
 					statusMessage.textContent = `Netzwerkfehler beim Laden: ${error.message}`;
 					console.error('Network error:', error);
+					clearParameterTable();
 				}
 			}
-		
+
 			function clearParameterTable() {
 				parameterTableBody.innerHTML = '<tr><td colspan="13" style="text-align: center; color: #8899a6; padding: 15px;">Bitte wählen Sie ein GDL-Objekt aus.</td></tr>';
 				rowCountSpan.textContent = 'Zeilen: 0';
 			}
-		
+
 			// ===== RENDER PARAMETERS =====
 			function renderParameters() {
 				parameterTableBody.innerHTML = '';
-				
+
 				if (allParameters.length === 0) {
-					parameterTableBody.innerHTML = '<tr><td colspan="13" style="text-align: center; color: #8899a6; padding: 15px;">Keine Parameter vorhanden. Importieren Sie eine XML-Datei oder erstellen Sie einen neuen Parameter.</td></tr>';
+					parameterTableBody.innerHTML = '<tr><td colspan="14" style="text-align: center; color: #8899a6; padding: 15px;">Keine Parameter vorhanden. Importieren Sie eine XML-Datei oder erstellen Sie einen neuen Parameter.</td></tr>';
 					rowCountSpan.textContent = 'Zeilen: 0';
 					return;
 				}
-		
+
 				allParameters.forEach((param, index) => {
 					const row = createParameterRow(param, index);
 					parameterTableBody.appendChild(row);
 				});
-		
+
 				rowCountSpan.textContent = `Zeilen: ${allParameters.length}`;
 				updateDeleteButtonState();
 			}
-		
+
 			function createParameterRow(param, index) {
 				const row = document.createElement('tr');
 				row.dataset.parameterId = param.id;
 				row.draggable = true;
-				// Add type color
-				const bgColor = TYPE_COLORS[param.gdl_type] || '#2d3748';
-				row.style.backgroundColor = bgColor + '33'; // Add transparency
-		
+
 				const deTranslation = param.translations.find(t => t.language_code === 'de');
 				const descriptionDe = deTranslation ? deTranslation.description : '';
-		
+
 				let defaultValueDisplay = '';
 				if (param.default_value_json) {
 					try {
@@ -499,52 +1348,269 @@
 						defaultValueDisplay = param.default_value_json;
 					}
 				}
-		
+
 				const typeSelectHtml = `
-					<select class="param-type-select param-table-select" data-param-id="${param.id}">
-						${GDL_TYPES.map(type => 
-							`<option value="${type}" ${param.gdl_type === type ? 'selected' : ''}>${type}</option>`
-						).join('')}
+					<select class="param-type-select param-table-select" data-param-id="${param.id}" tabindex="0">
+						${GDL_TYPES.map(type =>
+					`<option value="${type}" ${param.gdl_type === type ? 'selected' : ''}>${type}</option>`
+				).join('')}
 					</select>
 				`;
-		
-			
-			row.innerHTML = `
-				<td><input type="checkbox" class="param-checkbox" data-param-id="${param.id}"></td>
-				<td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_hidden" ${param.flag_hidden ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_child" ${param.flag_child ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_bold" ${param.flag_bold ? 'checked' : ''}></td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="flag_unique" ${param.flag_unique ? 'checked' : ''}></td>
-				<td>${typeSelectHtml}</td>
-				<td class="editable" data-field="gdl_name">${param.gdl_name}</td>
-				<td class="editable" data-field="description_de">${descriptionDe}</td>
-				<td class="editable" data-field="default_value">${defaultValueDisplay}</td>
-				<td class="editable" data-field="ui_page">${param.ui_page || 0}</td>
-				<td><input type="checkbox" class="flag-checkbox" data-field="is_ui_element" ${param.is_ui_element ? 'checked' : ''}></td>
-				<td>${param.array_type !== 'None' ? '<button class="array-edit-btn" data-param-id="' + param.id + '" title="Array-Werte bearbeiten">⊞</button> ' + param.array_type : ''}</td>
-			`;
-		
+
+
+
+
+				// Create type-specific default value input
+				let defaultValueHtml = '';
+				const defaultVal = defaultValueDisplay;
+
+				// Title and Separator types have no value, UI page, UI element, or array type
+				if (param.gdl_type === 'Title' || param.gdl_type === 'Separator') {
+					defaultValueHtml = '<span style="color: #888;">—</span>';
+				}
+				// Array parameters don't have a single default value
+				else if (param.array_type !== 'None') {
+					defaultValueHtml = '<span style="color: #888;">—</span>';
+				}
+				// Check if VALUES is active for this parameter
+				else {
+					const valuesList = getValuesListForParameter(param);
+
+					if (valuesList && valuesList.values.length > 0) {
+						// VALUES is active: create dropdown
+						let options = '';
+
+						// Use parsed value for comparison to ensure match (especially for Strings)
+						const currentVal = defaultValueDisplay;
+
+						if (valuesList.type === 'VALUES2' || valuesList.type === 'VALUES2_IMAGE') {
+							// VALUES{2} and VALUES2_IMAGE: display strings, store integers
+							valuesList.values.forEach(item => {
+								const selected = (currentVal == item.value) ? 'selected' : '';
+								options += `<option value="${item.value}" ${selected}>${item.display}</option>`;
+							});
+						} else if (valuesList.type === 'VALUES') {
+							// VALUES: display and store same values
+							valuesList.values.forEach(item => {
+								// For string parameters, the item.value might be "Holz" but currentVal might be Holz
+								// Perform a loose comparison or normalize
+								let isSelected = false;
+								if (param.gdl_type === 'String') {
+									const normalizedItem = item.value.replace(/^"(.*)"$/, '$1');
+									isSelected = (currentVal == normalizedItem || currentVal == item.value);
+								} else {
+									isSelected = (currentVal == item.value);
+								}
+
+								const selectedAttr = isSelected ? 'selected' : '';
+								options += `<option value="${item.value}" ${selectedAttr}>${item.display}</option>`;
+							});
+
+							// Add CUSTOM option if present
+							if (valuesList.hasCustom) {
+								const selected = (currentVal === '__CUSTOM__') ? 'selected' : '';
+								options += `<option value="__CUSTOM__" ${selected}>Benutzerdefiniert</option>`;
+							}
+						}
+
+						defaultValueHtml = `<select class="default-value-select" data-param-id="${param.id}" tabindex="0" style="width: 100%; padding: 4px;">${options}</select>`;
+					}
+					// No VALUES: standard input fields
+					else if (param.gdl_type === 'Boolean') {
+						// Boolean: checkbox
+						const isChecked = (param.default_value_json === '1' || param.default_value_json === 'true' || param.default_value_json === '1.0');
+						defaultValueHtml = `<input type="checkbox" class="default-value-checkbox" data-param-id="${param.id}" ${isChecked ? 'checked' : ''} tabindex="0">`;
+					} else if (param.gdl_type === 'Dictionary') {
+						// Dictionary: not editable
+						defaultValueHtml = `<span style="color: #888;" title="Scriptgesteuert">${defaultVal}</span>`;
+					} else if (param.gdl_type === 'Length' || param.gdl_type === 'Angle' || param.gdl_type === 'RealNum') {
+						// Numeric types: number input with step
+						defaultValueHtml = `<input type="number" step="0.01" class="default-value-input" data-param-id="${param.id}" value="${defaultVal}" tabindex="0" style="width: 100%; padding: 4px;">`;
+					} else if (param.gdl_type === 'String') {
+						// String types: text input
+						defaultValueHtml = `<input type="text" class="default-value-input" data-param-id="${param.id}" value="${defaultVal}" tabindex="0" style="width: 100%; padding: 4px;">`;
+					} else {
+						// Other types (Integer, Material, LineType, FillPattern, PenColor, Profile, BuildingMaterial): integer input
+						defaultValueHtml = `<input type="number" step="1" class="default-value-input" data-param-id="${param.id}" value="${defaultVal}" tabindex="0" style="width: 100%; padding: 4px;">`;
+					}
+				}
+
+				// For Title type: hide UI page, UI element, and Array type fields
+				// For Separator type: hide description, UI page, UI element, and Array type fields
+				const isTitleType = param.gdl_type === 'Title';
+				const isSeparatorType = param.gdl_type === 'Separator';
+				const isSpecialType = isTitleType || isSeparatorType;
+
+				const descriptionHtml = isSeparatorType ? '<span style="color: #888;">—</span>' : `<span class="editable" data-field="description_de" tabindex="0">${descriptionDe}</span>`;
+				const uiPageHtml = isSpecialType ? '<span style="color: #888;">—</span>' : `<span class="editable" data-field="ui_page" tabindex="0">${param.ui_page || 0}</span>`;
+				const uiElementHtml = isSpecialType ? '<span style="color: #888;">—</span>' : `<input type="checkbox" class="flag-checkbox" data-field="is_ui_element" ${param.is_ui_element ? 'checked' : ''} tabindex="0">`;
+				const arrayTypeHtml = isSpecialType ? '<span style="color: #888;">—</span>' : `
+				${param.array_type !== 'None' ? '<button class="array-edit-btn" data-param-id="' + param.id + '" title="Array-Werte bearbeiten" tabindex="0">⊞</button> ' : ''}
+				<select class="array-type-select" data-param-id="${param.id}" tabindex="0">
+					<option value="None" ${param.array_type === 'None' ? 'selected' : ''}>Kein Array</option>
+					<option value="1D" ${param.array_type === '1D' ? 'selected' : ''}>1-dimensional</option>
+					<option value="2D" ${param.array_type === '2D' ? 'selected' : ''}>2-dimensional</option>
+				</select>`;
+
+				// For Title and Separator: E, B, U flags are not applicable
+				// For Title: show a folding button in E column to collapse/expand child parameters
+				const flagChildHtml = isSpecialType ?
+					(isTitleType ? '<button class="fold-btn" data-param-id="' + param.id + '" title="Eingerückte Parameter ein-/ausblenden" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 4px; color: #88c0d0; transition: color 0.2s;">▼</button>' : '<span style="color: #888;">—</span>') :
+					`<input type="checkbox" class="flag-checkbox" data-field="flag_child" ${param.flag_child ? 'checked' : ''} tabindex="0">`;
+				const flagBoldHtml = isSpecialType ? '<span style="color: #888;">—</span>' : `<input type="checkbox" class="flag-checkbox" data-field="flag_bold" ${param.flag_bold ? 'checked' : ''} tabindex="0">`;
+				const flagUniqueHtml = isSpecialType ? '<span style="color: #888;">—</span>' : `<input type="checkbox" class="flag-checkbox" data-field="flag_unique" ${param.flag_unique ? 'checked' : ''} tabindex="0">`;
+
+				// Don't set styles in innerHTML, we'll set them after
+				const nameCellClass = 'editable';
+
+				row.innerHTML = `
+			<td><input type="checkbox" class="param-checkbox" data-param-id="${param.id}" tabindex="0"></td>
+			<td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
+			<td><input type="checkbox" class="flag-checkbox" data-field="flag_hidden" ${param.flag_hidden ? 'checked' : ''} tabindex="0"></td>
+			<td>${flagChildHtml}</td>
+			<td>${flagBoldHtml}</td>
+			<td>${flagUniqueHtml}</td>
+			<td>${typeSelectHtml}</td>
+			<td class="${nameCellClass}" data-field="gdl_name" tabindex="0">${param.gdl_name}</td>
+			<td>${descriptionHtml}</td>
+			<td>${defaultValueHtml}</td>
+			<td>${uiPageHtml}</td>
+			<td>${uiElementHtml}</td>
+			<td>${arrayTypeHtml}</td>
+			<td style="text-align: center;">
+				<button class="delete-param-btn" data-param-id="${param.id}" title="Parameter löschen" tabindex="0" style="background: none; border: none; color: #bf616a; cursor: pointer; padding: 5px; font-size: 1.1em;">
+					<i class="fas fa-trash"></i>
+				</button>
+			</td>
+		`;
+
 				row.querySelector('.param-checkbox').addEventListener('change', handleCheckboxChange);
 				row.querySelector('.param-type-select').addEventListener('change', (e) => handleTypeChange(param.id, e));
 				row.querySelectorAll('.flag-checkbox').forEach(cb => cb.addEventListener('change', (e) => handleFlagChange(param.id, e)));
+
+				// Delete button event listener
+				const deleteBtn = row.querySelector('.delete-param-btn');
+				if (deleteBtn) {
+					deleteBtn.addEventListener('click', (e) => {
+						e.stopPropagation(); // Prevent row selection
+						deleteParameter(param.id);
+					});
+				}
+
+				// Fold button event listener (for Title type)
+				const foldBtn = row.querySelector('.fold-btn');
+				if (foldBtn) {
+					foldBtn.addEventListener('click', (e) => {
+						e.stopPropagation(); // Prevent row selection
+						toggleChildParameters(param.id, foldBtn);
+					});
+				}
+
+				// Add event listeners for default value inputs
+				const defaultValueCheckbox = row.querySelector('.default-value-checkbox');
+				if (defaultValueCheckbox) {
+					defaultValueCheckbox.addEventListener('change', (e) => handleDefaultValueChange(param.id, e.target.checked ? '1' : '0'));
+				}
+				const defaultValueInput = row.querySelector('.default-value-input');
+				if (defaultValueInput) {
+					defaultValueInput.addEventListener('change', (e) => handleDefaultValueChange(param.id, e.target.value));
+				}
+				const defaultValueSelect = row.querySelector('.default-value-select');
+				if (defaultValueSelect) {
+					defaultValueSelect.addEventListener('change', (e) => handleDefaultValueChange(param.id, e.target.value));
+				}
+
+				// Add event listener for array type select (not for Title or Separator type)
+				if (!isSpecialType) {
+					const arrayTypeSelect = row.querySelector('.array-type-select');
+					if (arrayTypeSelect) {
+						arrayTypeSelect.addEventListener('change', (e) => handleArrayTypeChange(param.id, e.target.value));
+					}
+
+					// Add event listener for UI element checkbox (not for Title or Separator type)
+					const uiElementCheckbox = row.querySelector('input[data-field="is_ui_element"]');
+					if (uiElementCheckbox) {
+						uiElementCheckbox.addEventListener('change', (e) => handleFlagChange(param.id, e));
+					}
+
+					// Add event listener for UI page editable (not for Title or Separator type)
+					const uiPageCell = row.querySelector('.editable[data-field="ui_page"]');
+					if (uiPageCell) {
+						uiPageCell.addEventListener('click', () => makeEditable(uiPageCell, param.id));
+					}
+				}
+
 				row.querySelectorAll('.editable').forEach(cell => {
+					// Skip UI page editing for Title or Separator type
+					if (isSpecialType && cell.dataset.field === 'ui_page') {
+						return;
+					}
+					// Skip description editing for Separator type
+					if (isSeparatorType && cell.dataset.field === 'description_de') {
+						return;
+					}
 					cell.addEventListener('click', () => makeEditable(cell, param.id));
 				});
 				row.addEventListener('click', (e) => {
-					if (!e.target.closest('input') && !e.target.closest('select') && !e.target.closest('.editable')) {
+					// Always select the parameter when clicking on the row
+					// But don't interfere with input/select interactions
+					if (!e.target.matches('input[type="checkbox"]') && !e.target.matches('select')) {
 						selectParameter(param);
 					}
 				});
-		
+
 				row.addEventListener('dragstart', handleDragStart);
 				row.addEventListener('dragover', handleDragOver);
 				row.addEventListener('drop', handleDrop);
 				row.addEventListener('dragend', handleDragEnd);
-		
+
+				// Add type-specific background color to all td elements AFTER innerHTML
+				const bgColor = typeColors[param.gdl_type] || '#4c566a';
+				// Convert hex to rgba for proper transparency
+				const r = parseInt(bgColor.slice(1, 3), 16);
+				const g = parseInt(bgColor.slice(3, 5), 16);
+				const b = parseInt(bgColor.slice(5, 7), 16);
+				const rgbaColor = `rgba(${r}, ${g}, ${b}, 0.2)`; // 20% opacity
+
+				// Apply to all td elements in the row - set all styles here
+				const cells = row.querySelectorAll('td');
+				const isBoldForCell = param.flag_bold || param.gdl_type === 'Title';
+
+				cells.forEach((td, index) => {
+					// Build the complete style string for each cell
+					let styleStr = `background-color: ${rgbaColor} !important;`;
+
+					// Name column (index 7 - after checkbox, drag, 4 flags, type)
+					if (index === 7) {
+						if (param.flag_child) {
+							styleStr += ' padding-left: 40px !important;';
+						}
+						if (isBoldForCell) {
+							styleStr += ' font-weight: 800 !important;';
+						}
+					}
+					// Description column (index 8)
+					else if (index === 8) {
+						// Check if description is hidden (for Separator type)
+						const isHidden = td.innerHTML.includes('color: #888') && td.innerHTML.includes('—');
+						if (param.flag_child && !isHidden) {
+							styleStr += ' padding-left: 40px !important;';
+						}
+						if (isBoldForCell && !isHidden) {
+							styleStr += ' font-weight: 800 !important;';
+						}
+					}
+					// Standardwert column (index 9) - never indent
+					else if (index === 9) {
+						styleStr += ' padding-left: 0 !important;';
+					}
+
+					td.setAttribute('style', styleStr);
+				});
+
 				return row;
 			}
-		
+
 			// ===== REST OF THE FUNCTIONS (same as before) =====
 			// Füge hier alle weiteren Funktionen ein:
 			// - handleTypeChange
@@ -562,698 +1628,1438 @@
 			// - Drag & Drop functions
 			// - filterParameters
 			// - exportXml
-		
+
+			function detectTypeFromName(name) {
+				const lowerName = name.toLowerCase();
+				if (lowerName.startsWith('int_')) return 'Integer';
+				if (lowerName.startsWith('x_') || lowerName.startsWith('y_') || lowerName.startsWith('z_')) return 'Length';
+				if (lowerName.startsWith('mat_')) return 'Material';
+				if (lowerName.startsWith('bm_')) return 'BuildingMaterial';
+				if (lowerName.startsWith('prof_')) return 'Profile';
+				if (lowerName.startsWith('b_')) return 'Boolean';
+				if (lowerName.startsWith('str_')) return 'String';
+				if (lowerName.startsWith('pen_')) return 'PenColor';
+				if (lowerName.startsWith('fill_')) return 'FillPattern';
+				if (lowerName.startsWith('lin_')) return 'LineType';
+				if (lowerName.startsWith('ang_')) return 'Angle';
+				return null; // No match
+			}
+
+			// ===== TYPE CHANGE IN TABLE =====
 			async function handleTypeChange(parameterId, event) {
 				const newType = event.target.value;
+				const param = allParameters.find(p => p.id === parameterId);
+				const oldType = param ? param.gdl_type : null;
+
+				// Check if we need to re-render the row (Title or Separator types have different fields)
+				const needsRerender = (oldType === 'Title' || oldType === 'Separator') ||
+					(newType === 'Title' || newType === 'Separator');
+
 				try {
 					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
 						method: 'PUT',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ gdl_type: newType })
+						body: JSON.stringify({
+							gdl_type: newType,
+							object_path: currentLocalFilePath
+						})
 					});
+
 					if (response.ok) {
-						const param = allParameters.find(p => p.id === parameterId);
-						param.gdl_type = newType;
+						if (param) {
+							param.gdl_type = newType;
+						}
 						statusMessage.textContent = 'Status: Typ geändert.';
+
+						// Update right panel if this param is selected
 						if (currentEditingParam && currentEditingParam.id === parameterId) {
 							document.querySelector('select[name="param_type"]').value = newType;
+						}
+
+						// If switching to/from Title or Separator, re-render the entire row
+						if (needsRerender) {
+							// Reload parameters to get fresh data and re-render
+							await loadParameters(currentGdlObjectId);
+						} else {
+							// Just update row background color
+							const row = document.querySelector(`tr[data-parameter-id="${parameterId}"]`);
+							if (row) {
+								const bgColor = typeColors[newType] || '#4c566a';
+								const r = parseInt(bgColor.slice(1, 3), 16);
+								const g = parseInt(bgColor.slice(3, 5), 16);
+								const b = parseInt(bgColor.slice(5, 7), 16);
+								const rgbaColor = `rgba(${r}, ${g}, ${b}, 0.2)`;
+
+								row.querySelectorAll('td').forEach(td => {
+									td.setAttribute('style', `background-color: ${rgbaColor} !important;`);
+								});
+							}
+						}
+					} else {
+						const result = await response.json();
+						statusMessage.textContent = `Fehler: ${result.error}`;
+						event.target.value = oldType; // Revert
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+					event.target.value = oldType; // Revert
+				}
+			}
+
+			// ===== INLINE EDITING =====
+			function makeEditable(cell, parameterId) {
+				if (cell.querySelector('input')) return;
+
+				const originalValue = cell.textContent.trim();
+				const field = cell.dataset.field;
+
+				const input = document.createElement('input');
+				input.type = 'text';
+				input.value = originalValue;
+				input.style.width = '100%';
+				input.style.padding = '4px';
+				input.style.border = '1px solid var(--accent-color)';
+				input.style.backgroundColor = '#4c566a';
+				input.style.color = 'var(--text-color)';
+
+				cell.innerHTML = '';
+				cell.appendChild(input);
+				input.focus();
+				input.select();
+
+				const saveEdit = async () => {
+					const newValue = input.value.trim();
+					if (newValue !== originalValue) {
+						await updateParameterField(parameterId, field, newValue);
+
+						// If renaming, check for new type prefix
+						if (field === 'gdl_name') {
+							const autoType = detectTypeFromName(newValue);
+							if (autoType) {
+								const param = allParameters.find(p => p.id === parameterId);
+								if (param && param.gdl_type !== autoType) {
+									// Trigger type change
+									const dummyEvent = { target: { value: autoType } };
+									await handleTypeChange(parameterId, dummyEvent);
+								}
+							}
+						}
+					}
+					cell.textContent = newValue || originalValue;
+				};
+
+				input.addEventListener('blur', saveEdit);
+				input.addEventListener('keypress', (e) => {
+					if (e.key === 'Enter') {
+						input.blur();
+					}
+				});
+			}
+
+			async function updateParameterField(parameterId, field, value) {
+				const updateData = {};
+
+				if (field === 'description_de') {
+					const param = allParameters.find(p => p.id === parameterId);
+					const translations = param.translations.map(t => ({
+						...t,
+						description: t.language_code === 'de' ? value : t.description
+					}));
+					updateData.translations = translations;
+				} else if (field === 'default_value') {
+					updateData.default_value_json = value;
+				} else {
+					updateData[field] = value;
+				}
+
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							...updateData,
+							object_path: currentLocalFilePath
+						})
+					});
+
+					if (response.ok) {
+						const param = allParameters.find(p => p.id === parameterId);
+						if (field === 'description_de') {
+							const deTranslation = param.translations.find(t => t.language_code === 'de');
+							if (deTranslation) deTranslation.description = value;
+						} else if (field === 'default_value') {
+							param.default_value_json = value;
+						} else {
+							param[field] = value;
+						}
+						statusMessage.textContent = 'Status: Änderung gespeichert.';
+					} else {
+						const result = await response.json();
+						statusMessage.textContent = `Fehler beim Speichern: ${result.error}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+
+			async function handleFlagChange(parameterId, event) {
+				const field = event.target.dataset.field;
+				const value = event.target.checked;
+
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							[field]: value,
+							object_path: currentLocalFilePath
+						})
+					});
+
+					if (response.ok) {
+						const param = allParameters.find(p => p.id === parameterId);
+						param[field] = value;
+						statusMessage.textContent = 'Status: Flag gespeichert.';
+
+						// If flag_child changed, update indentation for Name and Description columns
+						if (field === 'flag_child') {
+							const row = document.querySelector(`tr[data-parameter-id="${parameterId}"]`);
+							if (row) {
+								const cells = row.querySelectorAll('td');
+								// Name is 8th cell (index 7), Description is 9th cell (index 8), Standardwert is 10th cell (index 9)
+								const nameCell = cells[7]; // Name column
+								const descriptionCell = cells[8]; // Description column
+								const defaultValueCell = cells[9]; // Standardwert column - ensure no indentation
+
+								if (nameCell) {
+									if (value) {
+										nameCell.style.setProperty('padding-left', '40px', 'important');
+									} else {
+										nameCell.style.removeProperty('padding-left');
+									}
+								}
+
+								if (descriptionCell) {
+									// Only apply indentation if cell is not hidden (doesn't contain "—")
+									const hasHiddenContent = descriptionCell.innerHTML.includes('color: #888') && descriptionCell.innerHTML.includes('—');
+									if (!hasHiddenContent) {
+										if (value) {
+											descriptionCell.style.setProperty('padding-left', '40px', 'important');
+										} else {
+											descriptionCell.style.removeProperty('padding-left');
+										}
+									}
+								}
+
+								// Ensure default value cell has no indentation - always set to 0
+								if (defaultValueCell) {
+									defaultValueCell.style.setProperty('padding-left', '0', 'important');
+								}
+							}
+						}
+
+						// If flag_bold changed, update font-weight for Name and Description columns
+						if (field === 'flag_bold') {
+							const row = document.querySelector(`tr[data-parameter-id="${parameterId}"]`);
+							if (row) {
+								const param = allParameters.find(p => p.id === parameterId);
+								const cells = row.querySelectorAll('td');
+								// Name is 8th cell (index 7), Description is 9th cell (index 8)
+								const nameCell = cells[7]; // Name column
+								const descriptionCell = cells[8]; // Description column
+
+								// Bold if flag_bold is active OR type is Title
+								const shouldBeBold = value || (param && param.gdl_type === 'Title');
+
+								if (nameCell) {
+									if (shouldBeBold) {
+										nameCell.style.fontWeight = '800';
+									} else {
+										nameCell.style.fontWeight = '';
+									}
+								}
+
+								if (descriptionCell) {
+									// Only apply bold if cell is not hidden (doesn't contain "—")
+									const hasHiddenContent = descriptionCell.innerHTML.includes('color: #888') && descriptionCell.innerHTML.includes('—');
+									if (!hasHiddenContent) {
+										if (shouldBeBold) {
+											descriptionCell.style.fontWeight = '800';
+										} else {
+											descriptionCell.style.fontWeight = '';
+										}
+									}
+								}
+							}
 						}
 					}
 				} catch (error) {
 					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
 				}
 			}
-		
 
-		// ===== TYPE CHANGE IN TABLE =====
-		async function handleTypeChange(parameterId, event) {
-			const newType = event.target.value;
-	
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ gdl_type: newType })
-				});
-	
-				if (response.ok) {
-					const param = allParameters.find(p => p.id === parameterId);
-					param.gdl_type = newType;
-					statusMessage.textContent = 'Status: Typ geändert.';
-					
-					// Update right panel if this param is selected
-					if (currentEditingParam && currentEditingParam.id === parameterId) {
-						document.querySelector('select[name="param_type"]').value = newType;
-					}
-				} else {
-					const result = await response.json();
-					statusMessage.textContent = `Fehler: ${result.error}`;
-					event.target.value = allParameters.find(p => p.id === parameterId).gdl_type; // Revert
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-				event.target.value = allParameters.find(p => p.id === parameterId).gdl_type; // Revert
-			}
-		}
-	
-		// ===== INLINE EDITING =====
-		function makeEditable(cell, parameterId) {
-			if (cell.querySelector('input')) return;
-	
-			const originalValue = cell.textContent.trim();
-			const field = cell.dataset.field;
-			
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.value = originalValue;
-			input.style.width = '100%';
-			input.style.padding = '4px';
-			input.style.border = '1px solid var(--accent-color)';
-			input.style.backgroundColor = '#4c566a';
-			input.style.color = 'var(--text-color)';
-	
-			cell.innerHTML = '';
-			cell.appendChild(input);
-			input.focus();
-			input.select();
-	
-			const saveEdit = async () => {
-				const newValue = input.value.trim();
-				if (newValue !== originalValue) {
-					await updateParameterField(parameterId, field, newValue);
-				}
-				cell.textContent = newValue || originalValue;
-			};
-	
-			input.addEventListener('blur', saveEdit);
-			input.addEventListener('keypress', (e) => {
-				if (e.key === 'Enter') {
-					input.blur();
-				}
-			});
-		}
-	
-		async function updateParameterField(parameterId, field, value) {
-			const updateData = {};
-			
-			if (field === 'description_de') {
-				const param = allParameters.find(p => p.id === parameterId);
-				const translations = param.translations.map(t => ({
-					...t,
-					description: t.language_code === 'de' ? value : t.description
-				}));
-				updateData.translations = translations;
-			} else if (field === 'default_value') {
-				updateData.default_value_json = value;
-			} else {
-				updateData[field] = value;
-			}
-	
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(updateData)
-				});
-	
-				if (response.ok) {
-					const param = allParameters.find(p => p.id === parameterId);
-					if (field === 'description_de') {
-						const deTranslation = param.translations.find(t => t.language_code === 'de');
-						if (deTranslation) deTranslation.description = value;
-					} else if (field === 'default_value') {
-						param.default_value_json = value;
-					} else {
-						param[field] = value;
-					}
-					statusMessage.textContent = 'Status: Änderung gespeichert.';
-				} else {
-					const result = await response.json();
-					statusMessage.textContent = `Fehler beim Speichern: ${result.error}`;
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-			}
-		}
-	
-		async function handleFlagChange(parameterId, event) {
-			const field = event.target.dataset.field;
-			const value = event.target.checked;
-	
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ [field]: value })
-				});
-	
-				if (response.ok) {
-					const param = allParameters.find(p => p.id === parameterId);
-					param[field] = value;
-					statusMessage.textContent = 'Status: Flag gespeichert.';
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-			}
-		}
-	
-		// ===== SELECTION & RIGHT PANEL =====
-		function selectParameter(param) {
-			document.querySelectorAll('#parameterTableBody tr').forEach(r => r.classList.remove('selected'));
-			const row = document.querySelector(`tr[data-parameter-id="${param.id}"]`);
-			if (row) row.classList.add('selected');
-	
-			currentEditingParam = param;
-			selectedRowParameterId = param.id; // Für "nach dieser Zeile einfügen"
-			updateRightPanel(param);
-		}
-	
-		function updateRightPanel(param) {
-			const rightPanel = document.querySelector('.right-panel');
-			if (!rightPanel || !param) return;
-	
-			rightPanel.querySelector('input[name="param_name"]').value = param.gdl_name || '';
-			rightPanel.querySelector('select[name="param_type"]').value = param.gdl_type || 'Length';
-			rightPanel.querySelector('select[name="param_function"]').value = param.function_group || 'Geometrie';
-			rightPanel.querySelector('select[name="param_array_type"]').value = param.array_type || 'None';
-			rightPanel.querySelector('input[name="flag_fix_name"]').checked = param.is_fix_name;
-			rightPanel.querySelector('input[name="flag_unique"]').checked = param.flag_unique;
-			rightPanel.querySelector('input[name="flag_bold"]').checked = param.flag_bold;
-			rightPanel.querySelector('input[name="flag_child"]').checked = param.flag_child;
-			rightPanel.querySelector('input[name="flag_hidden"]').checked = param.flag_hidden;
-			rightPanel.querySelector('input[name="param_ui_page"]').value = param.ui_page || 0;
-			rightPanel.querySelector('textarea[name="param_ui_code"]').value = param.ui_code || '';
-	
-			// Update translations
-			document.querySelectorAll('.lang-content').forEach(langContent => {
-				const lang = langContent.dataset.lang;
-				const translation = param.translations.find(t => t.language_code === lang);
-				
-				if (translation) {
-					langContent.querySelector('input[name="desc_lang"]').value = translation.description || '';
-					langContent.querySelector('textarea[name="values_list_lang"]').value = translation.values_list || '';
-					langContent.querySelector('textarea[name="ui_tooltip_lang"]').value = translation.ui_tooltip || '';
-				} else {
-					langContent.querySelector('input[name="desc_lang"]').value = '';
-					langContent.querySelector('textarea[name="values_list_lang"]').value = '';
-					langContent.querySelector('textarea[name="ui_tooltip_lang"]').value = '';
-				}
-				
-				langContent.querySelector('input[name="default_val_lang"]').value = param.default_value_json || '';
-			});
-		}
-	
-		async function updateParameterFromRightPanel() {
-			if (!currentEditingParam) return;
-	
-			const rightPanel = document.querySelector('.right-panel');
-			const activeLang = rightPanel.querySelector('.lang-tab.active').dataset.lang;
-			const activeLangContent = rightPanel.querySelector(`.lang-content[data-lang="${activeLang}"]`);
-	
-			const updateData = {
-				gdl_name: rightPanel.querySelector('input[name="param_name"]').value,
-				gdl_type: rightPanel.querySelector('select[name="param_type"]').value,
-				function_group: rightPanel.querySelector('select[name="param_function"]').value,
-				array_type: rightPanel.querySelector('select[name="param_array_type"]').value,
-				is_fix_name: rightPanel.querySelector('input[name="flag_fix_name"]').checked,
-				flag_unique: rightPanel.querySelector('input[name="flag_unique"]').checked,
-				flag_bold: rightPanel.querySelector('input[name="flag_bold"]').checked,
-				flag_child: rightPanel.querySelector('input[name="flag_child"]').checked,
-				flag_hidden: rightPanel.querySelector('input[name="flag_hidden"]').checked,
-				ui_page: parseInt(rightPanel.querySelector('input[name="param_ui_page"]').value),
-				ui_code: rightPanel.querySelector('textarea[name="param_ui_code"]').value,
-				default_value_json: activeLangContent.querySelector('input[name="default_val_lang"]').value,
-				translations: [{
-					language_code: activeLang,
-					description: activeLangContent.querySelector('input[name="desc_lang"]').value,
-					values_list: activeLangContent.querySelector('textarea[name="values_list_lang"]').value,
-					ui_tooltip: activeLangContent.querySelector('textarea[name="ui_tooltip_lang"]').value
-				}]
-			};
-	
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${currentEditingParam.id}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(updateData)
-				});
-	
-				if (response.ok) {
-					Object.assign(currentEditingParam, updateData);
-					await loadParameters(currentGdlObjectId);
-					statusMessage.textContent = 'Status: Parameter aktualisiert.';
-				}
-			} catch (error) {
-				statusMessage.textContent = `Fehler beim Speichern: ${error.message}`;
-			}
-		}
-	
-		// ===== ADD PARAMETER =====
-		function showAddParameterDialog() {
-			if (!currentGdlObjectId) {
-				alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
-				return;
-			}
-	
-			const paramName = prompt('Neuen Parameter erstellen\n\nBitte geben Sie den Parameternamen ein:');
-			
-			if (paramName && paramName.trim()) {
-				addParameter(paramName.trim());
-			}
-		}
-	
-		async function addParameter(gdlName) {
-			try {
-				const requestBody = {
-					gdl_object_id: currentGdlObjectId,
-					gdl_name: gdlName,
-					gdl_type: 'String',
-					translations: [
-						{ language_code: 'de', description: gdlName },
-						{ language_code: 'en', description: gdlName }
-					]
-				};
-	
-				// Wenn eine Zeile markiert ist, nach dieser einfügen
-				if (selectedRowParameterId) {
-					requestBody.insert_after_param_id = selectedRowParameterId;
-				}
-	
-				const response = await fetch(`${API_BASE_URL}/parameters/create`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(requestBody)
-				});
-	
-				const result = await response.json();
-	
-				if (response.ok) {
-					statusMessage.textContent = `Status: Parameter "${gdlName}" erstellt.`;
-					await loadParameters(currentGdlObjectId);
-				} else {
-					statusMessage.textContent = `Fehler: ${result.error}`;
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-			}
-		}
-	
-		// ===== DELETE PARAMETERS =====
-		function handleCheckboxChange(event) {
-			const parameterId = parseInt(event.target.dataset.paramId);
-			
-			if (event.target.checked) {
-				selectedParameterIds.add(parameterId);
-			} else {
-				selectedParameterIds.delete(parameterId);
-			}
-			
-			updateDeleteButtonState();
-		}
-	
-		function updateDeleteButtonState() {
-			const deleteBtn = document.querySelector('.action-btn.delete-param');
-			
-			if (selectedParameterIds.size > 0) {
-				deleteBtn.classList.remove('disabled');
-			} else {
-				deleteBtn.classList.add('disabled');
-			}
-		}
-	
-		async function deleteSelectedParameters() {
-			if (selectedParameterIds.size === 0) return;
-	
-			const confirmed = confirm(`Möchten Sie wirklich ${selectedParameterIds.size} Parameter löschen?`);
-			if (!confirmed) return;
-	
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/bulk-delete`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ parameter_ids: Array.from(selectedParameterIds) })
-				});
-	
-				const result = await response.json();
-	
-				if (response.ok) {
-					statusMessage.textContent = `Status: ${result.deleted_count} Parameter gelöscht.`;
-					selectedParameterIds.clear();
-					await loadParameters(currentGdlObjectId);
-				} else {
-					statusMessage.textContent = `Fehler: ${result.error}`;
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-			}
-		}
-	
-		// ===== DRAG & DROP REORDERING =====
-		let draggedRow = null;
-	
-		function handleDragStart(e) {
-			draggedRow = this;
-			this.style.opacity = '0.4';
-			e.dataTransfer.effectAllowed = 'move';
-		}
-	
-		function handleDragOver(e) {
-			if (e.preventDefault) {
-				e.preventDefault();
-			}
-			e.dataTransfer.dropEffect = 'move';
-			
-			const targetRow = e.target.closest('tr');
-			if (targetRow && targetRow !== draggedRow && targetRow.dataset.parameterId) {
-				const rect = targetRow.getBoundingClientRect();
-				const midpoint = rect.top + rect.height / 2;
-				
-				if (e.clientY < midpoint) {
-					targetRow.parentNode.insertBefore(draggedRow, targetRow);
-				} else {
-					targetRow.parentNode.insertBefore(draggedRow, targetRow.nextSibling);
-				}
-			}
-			
-			return false;
-		}
-	
-		function handleDrop(e) {
-			if (e.stopPropagation) {
-				e.stopPropagation();
-			}
-			return false;
-		}
-	
-		async function handleDragEnd(e) {
-			this.style.opacity = '1';
-			
-			const rows = Array.from(parameterTableBody.querySelectorAll('tr'));
-			const orderedIds = rows.map(row => parseInt(row.dataset.parameterId)).filter(id => !isNaN(id));
-			
-			if (orderedIds.length > 0) {
-				await saveParameterOrder(orderedIds);
-			}
-		}
-	
-		async function saveParameterOrder(orderedIds) {
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/reorder`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ ordered_ids: orderedIds })
-				});
-	
-				if (response.ok) {
-					statusMessage.textContent = 'Status: Reihenfolge gespeichert.';
-					const newOrder = [];
-					orderedIds.forEach(id => {
-						const param = allParameters.find(p => p.id === id);
-						if (param) newOrder.push(param);
+			async function handleDefaultValueChange(parameterId, value) {
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							default_value_json: value,
+							object_path: currentLocalFilePath
+						})
 					});
-					allParameters = newOrder;
+
+					if (response.ok) {
+						const param = allParameters.find(p => p.id === parameterId);
+						param.default_value_json = value;
+						statusMessage.textContent = 'Status: Standardwert gespeichert.';
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
 				}
-			} catch (error) {
-				statusMessage.textContent = `Fehler beim Speichern der Reihenfolge: ${error.message}`;
 			}
-		}
-	
-		// ===== FILTER =====
-		function filterParameters() {
-			const filterText = filterInput.value.toLowerCase();
-			const rows = parameterTableBody.querySelectorAll('tr');
-			
-			let visibleCount = 0;
-			rows.forEach(row => {
-				if (row.dataset.parameterId) {
-					const text = row.textContent.toLowerCase();
-					const isVisible = text.includes(filterText);
-					row.style.display = isVisible ? '' : 'none';
-					if (isVisible) visibleCount++;
+
+			async function handleArrayTypeChange(parameterId, arrayType) {
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							array_type: arrayType,
+							object_path: currentLocalFilePath
+						})
+					});
+
+					if (response.ok) {
+						const param = allParameters.find(p => p.id === parameterId);
+						param.array_type = arrayType;
+						statusMessage.textContent = 'Status: Array-Typ gespeichert.';
+						await triggerLocalExport();
+						// Reload parameters to update the display
+						await loadParameters(currentGdlObjectId);
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+
+			// ===== SELECTION & RIGHT PANEL =====
+			function selectParameter(param) {
+				document.querySelectorAll('#parameterTableBody tr').forEach(r => r.classList.remove('selected'));
+				const row = document.querySelector(`tr[data-parameter-id="${param.id}"]`);
+				if (row) row.classList.add('selected');
+
+				currentEditingParam = param;
+				selectedRowParameterId = param.id; // Für "nach dieser Zeile einfügen"
+
+				// Show/hide radiobutton section based on type
+				const radiobuttonSection = document.getElementById('radiobuttonSection');
+				if (radiobuttonSection) {
+					radiobuttonSection.style.display = (param.gdl_type === 'Integer') ? 'block' : 'none';
+				}
+
+				updateRightPanel(param);
+			}
+
+			function updateRightPanel(param) {
+				if (!param) return;
+
+				console.log('updateRightPanel called for:', param.gdl_name, 'ID:', param.id, 'ui_code:', param.ui_code);
+
+				const paramDetailsInfo = document.getElementById('parameterDetailsInfo');
+				const paramDetailsContent = document.getElementById('parameterDetailsContent');
+				const valuesDisabledMessage = document.getElementById('valuesDisabledMessage');
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				const valuesTextContainer = document.getElementById('valuesTextContainer');
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+
+				// Show content, hide info message
+				if (paramDetailsInfo) paramDetailsInfo.style.display = 'none';
+				if (paramDetailsContent) paramDetailsContent.style.display = 'block';
+
+				// Check if parameter type is Title, Separator, or Dictionary
+				const disabledTypes = ['Title', 'Separator', 'Dictionary'];
+				const isDisabled = disabledTypes.includes(param.gdl_type);
+
+				if (isDisabled) {
+					// Show disabled message, hide VALUES controls
+					if (valuesDisabledMessage) valuesDisabledMessage.style.display = 'block';
+					if (valuesTypeSelect) {
+						valuesTypeSelect.disabled = true;
+						valuesTypeSelect.value = 'none';
+					}
+					if (valuesTextContainer) valuesTextContainer.style.display = 'none';
+				} else {
+					// Hide disabled message, enable VALUES controls
+					if (valuesDisabledMessage) valuesDisabledMessage.style.display = 'none';
+					if (valuesTypeSelect) valuesTypeSelect.disabled = false;
+
+					// Load VALUES data from parameter
+					// We'll store this in ui_code field as JSON
+					let valuesData = { type: 'none', content: '' };
+					try {
+						if (param.ui_code && param.ui_code.trim().startsWith('{')) {
+							valuesData = JSON.parse(param.ui_code);
+							console.log('Parsed ui_code:', valuesData);
+						} else {
+							console.log('ui_code is empty or not JSON:', param.ui_code);
+						}
+					} catch (e) {
+						console.error('Error parsing ui_code:', e);
+						// If ui_code is not JSON, treat it as legacy content
+						if (param.ui_code) {
+							valuesData = { type: 'none', content: param.ui_code };
+						}
+					}
+
+					// Update UI
+					if (valuesTypeSelect) {
+						valuesTypeSelect.value = valuesData.type || 'none';
+						console.log('Set dropdown to:', valuesData.type);
+					}
+					if (valuesContentTextarea) {
+						valuesContentTextarea.value = valuesData.content || '';
+						console.log('Set content to:', valuesData.content);
+					}
+
+					// Show/hide textarea based on type
+					const showTextarea = (valuesData.type === 'VALUES' || valuesData.type === 'VALUES2' || valuesData.type === 'VALUES2_IMAGE');
+					console.log('Should show textarea:', showTextarea);
+					if (valuesTextContainer) {
+						valuesTextContainer.style.display = showTextarea ? 'block' : 'none';
+					}
+
+					// Show/hide image container for VALUES2_IMAGE
+					const valuesImageContainer = document.getElementById('valuesImageContainer');
+					if (valuesImageContainer) {
+						if (valuesData.type === 'VALUES2_IMAGE') {
+							valuesImageContainer.style.display = 'block';
+							// Generate image name inputs
+							generateImageSelections();
+						} else {
+							valuesImageContainer.style.display = 'none';
+						}
+					}
+
+					// Update help text and validate if textarea is shown
+					if (showTextarea) {
+						updateValuesTypeHelp();
+						validateValuesContent();
+					} else {
+						clearValidationMessages();
+					}
+				}
+			}
+
+			// Save VALUES data without reloading (for immediate feedback)
+			async function saveValuesDataOnly() {
+				if (!currentEditingParam) return;
+
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+
+				// Prepare VALUES data as JSON to store in ui_code
+				const valuesData = {
+					type: valuesTypeSelect ? valuesTypeSelect.value : 'none',
+					content: valuesContentTextarea ? valuesContentTextarea.value : ''
+				};
+
+				// Add image names if VALUES2_IMAGE is selected
+				if (valuesData.type === 'VALUES2_IMAGE') {
+					// Collect image names from all image-name-input fields
+					const imageInputs = document.querySelectorAll('.image-name-input');
+					valuesData.images = Array.from(imageInputs).map(input => input.value || '');
+				}
+
+				const updateData = {
+					ui_code: JSON.stringify(valuesData)
+				};
+
+				try {
+					const url = `${API_BASE_URL}/parameters/${currentEditingParam.id}`;
+
+					const response = await fetch(url, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(updateData)
+					});
+
+					if (response.ok) {
+						currentEditingParam.ui_code = updateData.ui_code;
+						if (statusMessage) {
+							statusMessage.textContent = 'Status: VALUES-Daten gespeichert.';
+						}
+						console.log('VALUES data saved:', valuesData);
+					} else {
+						const result = await response.json();
+						if (statusMessage) {
+							statusMessage.textContent = `Fehler beim Speichern: ${result.error || 'Unbekannt'}`;
+						}
+						console.error('Error saving VALUES:', result);
+					}
+				} catch (error) {
+					if (statusMessage) {
+						statusMessage.textContent = `Fehler beim Speichern: ${error.message}`;
+					}
+					console.error('Error saving VALUES:', error);
+				}
+			}
+
+			// Save and reload (for updating dropdowns in table)
+			async function updateParameterFromRightPanel() {
+				if (!currentEditingParam) return;
+
+				// Store the ID before any async operations
+				const currentParamId = currentEditingParam.id;
+
+				const valuesTypeSelect = document.getElementById('valuesTypeSelect');
+				const valuesContentTextarea = document.getElementById('valuesContentTextarea');
+
+				// Prepare VALUES data as JSON to store in ui_code
+				const valuesData = {
+					type: valuesTypeSelect ? valuesTypeSelect.value : 'none',
+					content: valuesContentTextarea ? valuesContentTextarea.value : ''
+				};
+
+				// Add image names if VALUES2_IMAGE is selected
+				if (valuesData.type === 'VALUES2_IMAGE') {
+					// Collect image names from all image-name-input fields
+					const imageInputs = document.querySelectorAll('.image-name-input');
+					valuesData.images = Array.from(imageInputs).map(input => input.value || '');
+				}
+
+				const updateData = {
+					ui_code: JSON.stringify(valuesData)
+				};
+
+				try {
+					const url = `${API_BASE_URL}/parameters/${currentParamId}`;
+
+					console.log('Saving VALUES data for param ID:', currentParamId, valuesData);
+
+					const response = await fetch(url, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(updateData)
+					});
+
+					if (response.ok) {
+						currentEditingParam.ui_code = updateData.ui_code;
+						if (statusMessage) {
+							statusMessage.textContent = 'Status: VALUES-Daten gespeichert.';
+						}
+						console.log('VALUES data saved successfully');
+
+						// Store the parameter name and index before reload
+						const paramName = currentEditingParam.gdl_name;
+						const paramIndex = allParameters.findIndex(p => p.id === currentParamId);
+
+						// Reload the parameter table to update the default value dropdown
+						await loadParameters(currentGdlObjectId);
+
+						// Re-select the parameter: try by ID first, then by name+index, then by name only
+						let freshParam = allParameters.find(p => p.id === currentParamId);
+
+						if (!freshParam && paramIndex >= 0 && paramIndex < allParameters.length) {
+							// Try by index and name
+							const paramAtIndex = allParameters[paramIndex];
+							if (paramAtIndex && paramAtIndex.gdl_name === paramName) {
+								freshParam = paramAtIndex;
+								console.log('Found parameter by index and name');
+							}
+						}
+
+						if (!freshParam) {
+							// Try by name only (first match)
+							freshParam = allParameters.find(p => p.gdl_name === paramName);
+							console.log('Found parameter by name only');
+						}
+
+						if (freshParam) {
+							console.log('Re-selecting parameter:', freshParam.gdl_name, 'ID:', freshParam.id, 'ui_code:', freshParam.ui_code);
+							selectParameter(freshParam);
+						} else {
+							console.error('Could not find parameter with ID:', currentParamId, 'or name:', paramName);
+						}
+					} else {
+						const result = await response.json();
+						if (statusMessage) {
+							statusMessage.textContent = `Fehler beim Speichern: ${result.error || 'Unbekannt'}`;
+						}
+						console.error('Error saving VALUES:', result);
+					}
+				} catch (error) {
+					if (statusMessage) {
+						statusMessage.textContent = `Fehler beim Speichern: ${error.message}`;
+					}
+					console.error('Error saving VALUES:', error);
+				}
+			}
+
+			// ===== ADD PARAMETER =====
+			function showAddParameterDialog() {
+				if (!currentGdlObjectId) {
+					alert('Bitte wählen Sie zuerst ein GDL-Objekt.');
+					return;
+				}
+
+				const paramName = prompt('Neuen Parameter erstellen\n\nBitte geben Sie den Parameternamen ein:');
+
+				if (paramName && paramName.trim()) {
+					addParameter(paramName.trim());
+				}
+			}
+
+			async function addParameter(gdlName) {
+				try {
+					const detectedType = detectTypeFromName(gdlName) || 'String';
+					const requestBody = {
+						gdl_object_id: currentGdlObjectId,
+						gdl_name: gdlName,
+						gdl_type: detectedType,
+						translations: [
+							{ language_code: 'de', description: gdlName },
+							{ language_code: 'en', description: gdlName }
+						]
+					};
+
+					// Wenn eine Zeile markiert ist, nach dieser einfügen
+					if (selectedRowParameterId) {
+						requestBody.insert_after_param_id = selectedRowParameterId;
+						console.log('Inserting parameter after ID:', selectedRowParameterId);
+					} else {
+						console.log('No row selected, inserting at end');
+					}
+
+					console.log('Request body:', requestBody);
+
+					const response = await fetch(`${API_BASE_URL}/parameters/create`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(requestBody)
+					});
+
+					let result = null;
+					try {
+						result = await response.json();
+					} catch (e) {
+						result = { error: response.statusText || 'Unbekannter Fehler' };
+					}
+					console.log('Create parameter response:', result);
+
+					if (response.ok) {
+						statusMessage.textContent = `Status: Parameter "${gdlName}" erstellt.`;
+						await triggerLocalExport();
+						await loadParameters(currentGdlObjectId);
+
+						// Automatically select the new parameter
+						if (result && result.data && result.data.id) {
+							const newParamId = result.data.id;
+							const newParam = allParameters.find(p => p.id === newParamId);
+							if (newParam) {
+								selectParameter(newParam);
+							}
+						}
+					} else {
+						// Always show status message for errors
+						statusMessage.textContent = `Fehler: ${result.error || response.statusText}`;
+
+						// Additionally show modal for conflicts (409) or explicit duplicate messages
+						if (response.status === 409 || (result && result.error && /already exists|existiert bereits/i.test(result.error))) {
+							showErrorModal(result.error || 'Parameter mit diesem Namen existiert bereits.');
+						}
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+					console.error('Error adding parameter:', error);
+				}
+			}
+
+			// ===== ERROR MODAL =====
+			function showErrorModal(message) {
+				const modal = document.getElementById('errorModal');
+				const msg = document.getElementById('errorModalMessage');
+				msg.textContent = message;
+				modal.classList.remove('hidden');
+			}
+
+			function hideErrorModal() {
+				const modal = document.getElementById('errorModal');
+				modal.classList.add('hidden');
+			}
+
+			document.addEventListener('click', function (e) {
+				const modal = document.getElementById('errorModal');
+				if (!modal) return;
+				if (e.target.id === 'errorModal' || e.target.id === 'errorModalClose') {
+					hideErrorModal();
 				}
 			});
-			
-			rowCountSpan.textContent = `Zeilen: ${visibleCount} / ${allParameters.length}`;
-		}
-	
-		// ===== EXPORT XML =====
-		async function exportXml(objectId) {
-			if (!objectId) {
-				alert('Kein GDL-Objekt geladen.');
-				return;
-			}
-	
-			try {
-				statusMessage.textContent = 'Status: XML wird generiert...';
-				
-				const response = await fetch(`${API_BASE_URL}/objects/${objectId}/parameters/export`);
-				
-				if (response.ok) {
-					const blob = await response.blob();
-					const url = window.URL.createObjectURL(blob);
-					const a = document.createElement('a');
-					a.href = url;
-					a.download = `${currentGdlObjectName.replace('.gsm', '')}_parameters.xml`;
-					document.body.appendChild(a);
-					a.click();
-					window.URL.revokeObjectURL(url);
-					document.body.removeChild(a);
-					
-					statusMessage.textContent = 'Status: XML erfolgreich exportiert.';
-				} else {
-					statusMessage.textContent = 'Fehler beim XML-Export.';
-				}
-			} catch (error) {
-				statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
-			}
-		}
 
-		
-		// ===== ARRAY EDITOR =====
-		let currentArrayParam = null;
-		
-		window.openArrayEditor = function(paramId) {
-			const param = allParameters.find(p => p.id == paramId);
-			if (!param) return;
-			
-			currentArrayParam = param;
-			
-			const modal = document.getElementById('arrayEditorModal');
-			const title = document.getElementById('arrayEditorTitle');
-			const paramNameSpan = document.getElementById('arrayParamName');
-			const arrayTypeSelect = document.getElementById('arrayTypeSelect');
-			
-			title.textContent = 'Array-Parameter Editor';
-			paramNameSpan.textContent = param.gdl_name;
-			arrayTypeSelect.value = param.array_type || 'None';
-			
-			updateArrayContainers();
-			loadArrayValues(param);
-			
-			modal.classList.add('active');
-		};
-		
-		window.closeArrayEditor = function() {
-			document.getElementById('arrayEditorModal').classList.remove('active');
-			currentArrayParam = null;
-		};
-		
-		function updateArrayContainers() {
-			const arrayType = document.getElementById('arrayTypeSelect').value;
-			const array1D = document.getElementById('array1DContainer');
-			const array2D = document.getElementById('array2DContainer');
-			const modeGroup = document.getElementById('arrayModeGroup');
-			
-			array1D.style.display = arrayType === '1D' ? 'block' : 'none';
-			array2D.style.display = arrayType === '2D' ? 'block' : 'none';
-			modeGroup.style.display = arrayType !== 'None' ? 'block' : 'none';
-		}
-		
-		function loadArrayValues(param) {
-			if (!param.default_value_json) return;
-			
-			try {
-				const values = JSON.parse(param.default_value_json);
-				
-				if (param.array_type === '1D' && Array.isArray(values)) {
-					render1DArray(values);
-				} else if (param.array_type === '2D' && Array.isArray(values)) {
-					render2DArray(values);
+			// ===== DELETE PARAMETER =====
+			async function deleteParameter(parameterId) {
+				if (!parameterId) return;
+
+				const confirmed = confirm('Möchten Sie diesen Parameter wirklich löschen?');
+				if (!confirmed) return;
+
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${parameterId}`, {
+						method: 'DELETE'
+					});
+
+					const result = await response.json();
+
+					if (response.ok) {
+						statusMessage.textContent = 'Status: Parameter gelöscht.';
+						await triggerLocalExport();
+						selectedParameterIds.delete(parameterId);
+						if (currentEditingParam && currentEditingParam.id === parameterId) {
+							currentEditingParam = null;
+						}
+						await loadParameters(currentGdlObjectId);
+					} else {
+						statusMessage.textContent = `Fehler: ${result.error || 'Unbekannter Fehler'}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
 				}
-			} catch (e) {
-				console.error('Error parsing array values:', e);
 			}
-		}
-		
-		function render1DArray(values) {
-			const tbody = document.getElementById('array1DBody');
-			tbody.innerHTML = '';
-			
-			values.forEach((val, idx) => {
-				const row = tbody.insertRow();
-				row.innerHTML = `
-					<td>${idx}</td>
+
+			function toggleChildParameters(titleParamId, foldBtn) {
+				// Find the Title parameter row
+				const titleRow = document.querySelector(`tr[data-parameter-id="${titleParamId}"]`);
+				if (!titleRow) return;
+
+				// Find the index of this Title parameter in allParameters
+				const titleIndex = allParameters.findIndex(p => p.id === titleParamId);
+				if (titleIndex === -1) return;
+
+				// Find all child parameters (parameters with flag_child = true that come after this Title)
+				const childParams = [];
+				for (let i = titleIndex + 1; i < allParameters.length; i++) {
+					const param = allParameters[i];
+					// Stop when we hit another Title or Separator, or a non-child parameter
+					if (param.gdl_type === 'Title' || param.gdl_type === 'Separator' || !param.flag_child) {
+						break;
+					}
+					if (param.flag_child) {
+						childParams.push(param.id);
+					}
+				}
+
+				// Toggle visibility of child parameter rows
+				const isCurrentlyExpanded = foldBtn.textContent === '▼';
+				childParams.forEach(childId => {
+					const childRow = document.querySelector(`tr[data-parameter-id="${childId}"]`);
+					if (childRow) {
+						childRow.style.display = isCurrentlyExpanded ? 'none' : '';
+					}
+				});
+
+				// Update fold button icon
+				foldBtn.textContent = isCurrentlyExpanded ? '▶' : '▼';
+			}
+
+			// ===== DELETE PARAMETERS =====
+			function handleCheckboxChange(event) {
+				const parameterId = parseInt(event.target.dataset.paramId);
+
+				if (event.target.checked) {
+					selectedParameterIds.add(parameterId);
+				} else {
+					selectedParameterIds.delete(parameterId);
+				}
+
+				updateDeleteButtonState();
+			}
+
+			function updateDeleteButtonState() {
+				const deleteBtn = document.querySelector('.action-btn.delete-param');
+
+				if (selectedParameterIds.size > 0) {
+					deleteBtn.classList.remove('disabled');
+				} else {
+					deleteBtn.classList.add('disabled');
+				}
+			}
+
+			async function deleteSelectedParameters() {
+				if (selectedParameterIds.size === 0) return;
+
+				const confirmed = confirm(`Möchten Sie wirklich ${selectedParameterIds.size} Parameter löschen?`);
+				if (!confirmed) return;
+
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/bulk-delete`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ parameter_ids: Array.from(selectedParameterIds) })
+					});
+
+					const result = await response.json();
+
+					if (response.ok) {
+						statusMessage.textContent = `Status: ${result.deleted_count} Parameter gelöscht.`;
+						await triggerLocalExport();
+						selectedParameterIds.clear();
+						await loadParameters(currentGdlObjectId);
+					} else {
+						statusMessage.textContent = `Fehler: ${result.error}`;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+
+			// ===== DRAG & DROP REORDERING =====
+			let draggedRow = null;
+			let draggedChildRows = []; // Child parameters that should move with a folded Title
+
+			function handleDragStart(e) {
+				draggedRow = this;
+				this.style.opacity = '0.4';
+				e.dataTransfer.effectAllowed = 'move';
+
+				// Check if this is a folded Title parameter
+				const parameterId = parseInt(this.dataset.parameterId);
+				const param = allParameters.find(p => p.id === parameterId);
+
+				draggedChildRows = []; // Reset
+
+				if (param && param.gdl_type === 'Title') {
+					// Check if it's folded (look for fold button with ▶ icon)
+					const foldBtn = this.querySelector('.fold-btn');
+					const isFolded = foldBtn && foldBtn.textContent === '▶';
+
+					if (isFolded) {
+						// Find all child parameters that belong to this Title
+						const titleIndex = allParameters.findIndex(p => p.id === parameterId);
+						if (titleIndex !== -1) {
+							for (let i = titleIndex + 1; i < allParameters.length; i++) {
+								const childParam = allParameters[i];
+								// Stop when we hit another Title or Separator, or a non-child parameter
+								if (childParam.gdl_type === 'Title' || childParam.gdl_type === 'Separator' || !childParam.flag_child) {
+									break;
+								}
+								if (childParam.flag_child) {
+									const childRow = document.querySelector(`tr[data-parameter-id="${childParam.id}"]`);
+									if (childRow) {
+										draggedChildRows.push(childRow);
+										childRow.style.opacity = '0.4';
+									}
+								}
+							}
+						}
+						console.log('Found ' + draggedChildRows.length + ' child rows to drag');
+					}
+				}
+			}
+
+			function handleDragOver(e) {
+				if (e.preventDefault) {
+					e.preventDefault();
+				}
+				e.dataTransfer.dropEffect = 'move';
+
+				const targetRow = e.target.closest('tr');
+				if (targetRow && targetRow !== draggedRow && targetRow.dataset.parameterId) {
+					// Don't allow dropping on a child row that's being dragged
+					if (draggedChildRows.includes(targetRow)) {
+						return false;
+					}
+
+					const rect = targetRow.getBoundingClientRect();
+					const midpoint = rect.top + rect.height / 2;
+
+					// Remove all dragged rows from DOM first to avoid duplication
+					if (draggedRow.parentNode) {
+						draggedRow.parentNode.removeChild(draggedRow);
+					}
+					draggedChildRows.forEach(childRow => {
+						if (childRow.parentNode) {
+							childRow.parentNode.removeChild(childRow);
+						}
+					});
+
+					if (e.clientY < midpoint) {
+						// Insert before target
+						targetRow.parentNode.insertBefore(draggedRow, targetRow);
+					} else {
+						// Insert after target
+						targetRow.parentNode.insertBefore(draggedRow, targetRow.nextSibling);
+					}
+
+					// Insert child rows after the title in correct order
+					let insertAfter = draggedRow;
+					draggedChildRows.forEach(childRow => {
+						if (insertAfter.nextSibling) {
+							insertAfter.parentNode.insertBefore(childRow, insertAfter.nextSibling);
+						} else {
+							insertAfter.parentNode.appendChild(childRow);
+						}
+						insertAfter = childRow;
+					});
+				}
+
+				return false;
+			}
+
+			function handleDrop(e) {
+				if (e.stopPropagation) {
+					e.stopPropagation();
+				}
+				return false;
+			}
+
+			async function handleDragEnd(e) {
+				this.style.opacity = '1';
+
+				// Reset opacity for child rows
+				draggedChildRows.forEach(childRow => {
+					childRow.style.opacity = '1';
+				});
+
+				const rows = Array.from(parameterTableBody.querySelectorAll('tr'));
+				const orderedIds = rows.map(row => parseInt(row.dataset.parameterId)).filter(id => !isNaN(id));
+
+				if (orderedIds.length > 0) {
+					await saveParameterOrder(orderedIds);
+				}
+
+				// Clear dragged child rows
+				draggedChildRows = [];
+			}
+
+			async function saveParameterOrder(orderedIds) {
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/reorder`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ ordered_ids: orderedIds })
+					});
+
+					if (response.ok) {
+						statusMessage.textContent = 'Status: Reihenfolge gespeichert.';
+						await triggerLocalExport();
+						const newOrder = [];
+						orderedIds.forEach(id => {
+							const param = allParameters.find(p => p.id === id);
+							if (param) newOrder.push(param);
+						});
+						allParameters = newOrder;
+					}
+				} catch (error) {
+					statusMessage.textContent = `Fehler beim Speichern der Reihenfolge: ${error.message}`;
+				}
+			}
+
+			// ===== FILTER =====
+			function filterParameters() {
+				const filterText = filterInput.value.toLowerCase();
+				const rows = parameterTableBody.querySelectorAll('tr');
+
+				let visibleCount = 0;
+				rows.forEach(row => {
+					if (row.dataset.parameterId) {
+						const text = row.textContent.toLowerCase();
+						const isVisible = text.includes(filterText);
+						row.style.display = isVisible ? '' : 'none';
+						if (isVisible) visibleCount++;
+					}
+				});
+				rowCountSpan.textContent = `Zeilen: ${visibleCount} / ${allParameters.length}`;
+			}
+
+
+			// ===== UPDATE GDL SCRIPTS =====
+			// Assigned to window to be accessible from HTML onclick while keeping access to closure variables (allParameters)
+			window.updateGdlScripts = async function (objectId) {
+				if (!objectId) {
+					alert('Kein GDL-Objekt geladen.');
+					return;
+				}
+
+				// Confirm action
+				if (!confirm('Möchten Sie die lokalen GDL-Scripte (Parameter/Master) mit den aktuellen Werten aktualisieren?\n\nEs werden nur die generierten Blöcke aktualisiert, Ihr manueller Code bleibt erhalten.')) {
+					return;
+				}
+
+				try {
+					statusMessage.textContent = 'Status: Scripte werden aktualisiert...';
+
+					// Check if object is synced with local files
+					const objResponse = await fetch(`${API_BASE_URL}/gdl-objects/${objectId}`);
+					const objResult = await objResponse.json();
+
+					if (!objResult.success || !objResult.data) {
+						alert('Fehler beim Laden der Objektinformationen.');
+						return;
+					}
+
+					const object = objResult.data;
+
+					if (!object.is_local_sync || !object.local_file_path) {
+						alert('Diese Funktion steht nur für Objekte zur Verfügung, die mit lokalen Dateien synchronisiert sind.');
+						return;
+					}
+
+					const encodedId = btoa(object.local_file_path);
+					const url = `${API_BASE_URL}/objects/${encodedId}/update-scripts`;
+
+					// Prepare payload
+					const payload = {
+						parameters: allParameters.map(p => {
+							// Try to extract raw values from ui_code
+							if (p.ui_code && p.ui_code.trim().startsWith('{')) {
+								try {
+									const uiData = JSON.parse(p.ui_code);
+									if ((uiData.type === 'VALUES' || uiData.type === 'VALUES2') && uiData.content) {
+										// Clone param and add values_raw
+										return { ...p, values_raw: uiData.content };
+									}
+								} catch (e) { /* ignore parse error */ }
+							}
+							return p;
+						})
+					};
+
+					console.log('Update Scripts Payload:', payload);
+
+					const response = await fetch(url, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload)
+					});
+
+					const result = await response.json();
+
+					if (response.ok && result.success) {
+						let msg = 'Scripte erfolgreich aktualisiert!';
+						if (result.results) {
+							if (result.results.parameter_script) msg += '\n- Parameter-Script aktualisiert';
+						}
+						statusMessage.textContent = 'Status: Scripte aktualisiert.';
+						await triggerLocalExport();
+						loadParameters(currentGdlObjectId); // Changed from loadParameters() to loadParameters(currentGdlObjectId)
+						alert(msg);
+					} else {
+						const errorMsg = result.error || 'Unbekannter Fehler';
+						statusMessage.textContent = `Fehler: ${errorMsg}`;
+						alert(`Fehler beim Aktualisieren: ${errorMsg}`);
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+					console.error('Update Scripts Error:', error);
+					alert(`Netzwerkfehler: ${error.message}`);
+				}
+			};
+
+			// ===== EXPORT XML =====
+			async function exportXml(objectId) {
+				if (!objectId) {
+					alert('Kein GDL-Objekt geladen.');
+					return;
+				}
+
+				try {
+					statusMessage.textContent = 'Status: XML wird generiert...';
+
+					// Determine API Base based on LocalStorage
+					const dataSource = localStorage.getItem('dataSource') || 'DB';
+					let exportUrl = `${API_BASE_URL}/objects/${objectId}/parameters/export`;
+
+					if (dataSource === 'FILE') {
+						const encodedId = (objectId.includes('/') || objectId.includes('\\')) ? btoa(objectId) : objectId;
+						exportUrl = `${API_BASE_URL}/objects/${encodedId}/export-xml`;
+					}
+
+					const response = await fetch(exportUrl);
+
+					if (response.ok) {
+						const blob = await response.blob();
+						const url = window.URL.createObjectURL(blob);
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = `${currentGdlObjectName.replace('.gsm', '')}_parameters.xml`;
+						document.body.appendChild(a);
+						a.click();
+						window.URL.revokeObjectURL(url);
+						document.body.removeChild(a);
+
+						statusMessage.textContent = 'Status: XML erfolgreich exportiert.';
+					} else {
+						statusMessage.textContent = 'Fehler beim XML-Export.';
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+
+			// ===== EXPORT ZIP =====
+			async function exportZip(objectId) {
+				if (!objectId) {
+					alert('Kein GDL-Objekt geladen.');
+					return;
+				}
+
+				try {
+					statusMessage.textContent = 'Status: ZIP wird generiert...';
+
+					const exportUrl = `${API_BASE_URL}/objects/${objectId}/export-zip`;
+
+					const response = await fetch(exportUrl);
+
+					if (response.ok) {
+						const blob = await response.blob();
+						const url = window.URL.createObjectURL(blob);
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = `${currentGdlObjectName.replace('.gsm', '')}.zip`;
+						document.body.appendChild(a);
+						a.click();
+						window.URL.revokeObjectURL(url);
+						document.body.removeChild(a);
+
+						statusMessage.textContent = 'Status: ZIP erfolgreich exportiert.';
+					} else {
+						statusMessage.textContent = 'Fehler beim ZIP-Export.';
+					}
+				} catch (error) {
+					statusMessage.textContent = `Netzwerkfehler: ${error.message}`;
+				}
+			}
+
+
+			// ===== ARRAY EDITOR =====
+			let currentArrayParam = null;
+
+			window.openArrayEditor = function (paramId) {
+				const param = allParameters.find(p => p.id == paramId);
+				if (!param) return;
+
+				currentArrayParam = param;
+
+				const modal = document.getElementById('arrayEditorModal');
+				const title = document.getElementById('arrayEditorTitle');
+				const paramNameSpan = document.getElementById('arrayParamName');
+				const arrayTypeSelect = document.getElementById('arrayTypeSelect');
+
+				title.textContent = 'Array-Parameter Editor';
+				paramNameSpan.textContent = param.gdl_name;
+				arrayTypeSelect.value = param.array_type || 'None';
+
+				updateArrayContainers();
+				loadArrayValues(param);
+
+				modal.classList.add('active');
+			};
+
+			window.closeArrayEditor = function () {
+				document.getElementById('arrayEditorModal').classList.remove('active');
+				currentArrayParam = null;
+			};
+
+			function updateArrayContainers() {
+				const arrayType = document.getElementById('arrayTypeSelect').value;
+				const array1D = document.getElementById('array1DContainer');
+				const array2D = document.getElementById('array2DContainer');
+				const modeGroup = document.getElementById('arrayModeGroup');
+
+				array1D.style.display = arrayType === '1D' ? 'block' : 'none';
+				array2D.style.display = arrayType === '2D' ? 'block' : 'none';
+				modeGroup.style.display = arrayType !== 'None' ? 'block' : 'none';
+
+				// Reset to manual when changing array type to avoid confusion
+				const manualRadio = document.querySelector('input[name="arrayMode"][value="manual"]');
+				if (manualRadio) manualRadio.checked = true;
+				updateArrayModeOptions();
+			}
+
+			function updateArrayModeOptions() {
+				const mode = document.querySelector('input[name="arrayMode"]:checked').value;
+				const options = document.getElementById('arrayModeOptions');
+				const sameContainer = document.getElementById('modeSameContainer');
+				const incrementContainer = document.getElementById('modeIncrementContainer');
+
+				options.style.display = mode === 'manual' ? 'none' : 'block';
+				sameContainer.style.display = mode === 'same' ? 'block' : 'none';
+				incrementContainer.style.display = mode === 'increment' ? 'block' : 'none';
+			}
+
+			window.applyArrayAutoFill = function () {
+				const mode = document.querySelector('input[name="arrayMode"]:checked').value;
+				const arrayType = document.getElementById('arrayTypeSelect').value;
+
+				if (mode === 'same') {
+					const val = document.getElementById('arrayFillValue').value;
+					const inputs = document.querySelectorAll(arrayType === '1D' ? '#array1DBody input' : '#array2DBody input');
+					inputs.forEach(inp => inp.value = val);
+				} else if (mode === 'increment') {
+					const startValStr = document.getElementById('arrayStartValue').value;
+					const formula = document.getElementById('arrayFormula').value;
+					const startVal = parseFloat(startValStr) || 0;
+
+					if (arrayType === '1D') {
+						const inputs = document.querySelectorAll('#array1DBody input');
+						inputs.forEach((inp, idx) => {
+							const i = idx + 1; // 1-based index
+							inp.value = evaluateFormula(formula, i, startVal);
+						});
+					} else if (arrayType === '2D') {
+						const tbody = document.getElementById('array2DBody');
+						if (!tbody.rows.length) return;
+
+						const rowCount = tbody.rows.length;
+						const colCount = tbody.rows[0].cells.length - 2; // Index cell and delete button
+
+						let absoluteIdx = 1;
+						// Column-wise filling (von oben nach unten)
+						for (let c = 0; c < colCount; c++) {
+							for (let r = 0; r < rowCount; r++) {
+								const input = tbody.rows[r].cells[c + 1].querySelector('input');
+								if (input) {
+									input.value = evaluateFormula(formula, absoluteIdx, startVal);
+									absoluteIdx++;
+								}
+							}
+						}
+					}
+				}
+			};
+
+			function evaluateFormula(formula, i, startValue) {
+				// Simple formula evaluator
+				// Supports 'i' for 1-based index
+				try {
+					// If formula is just a number, treat it as step size: startValue + (i-1)*step
+					if (!isNaN(formula) && formula.trim() !== "") {
+						const step = parseFloat(formula);
+						return startValue + (i - 1) * step;
+					}
+
+					// If formula has 'i' or 's', replace them and evaluate
+					if (formula.includes('i') || formula.includes('s')) {
+						let sanitizedExpr = formula.replace(/i/g, `(${i})`);
+						sanitizedExpr = sanitizedExpr.replace(/s/g, `(${startValue})`);
+						return eval(sanitizedExpr);
+					}
+
+					return startValue;
+				} catch (e) {
+					console.error("Formula eval error:", e);
+					return startValue;
+				}
+			}
+
+			function loadArrayValues(param) {
+				if (!param.default_value_json) return;
+
+				try {
+					const values = JSON.parse(param.default_value_json);
+
+					if (param.array_type === '1D' && Array.isArray(values)) {
+						render1DArray(values);
+					} else if (param.array_type === '2D' && Array.isArray(values)) {
+						render2DArray(values);
+					}
+				} catch (e) {
+					console.error('Error parsing array values:', e);
+				}
+			}
+
+			function render1DArray(values) {
+				const tbody = document.getElementById('array1DBody');
+				tbody.innerHTML = '';
+
+				values.forEach((val, idx) => {
+					const row = tbody.insertRow();
+					row.innerHTML = `
+					<td>${idx + 1}</td>
 					<td><input type="text" value="${val}" data-index="${idx}"></td>
 					<td><button type="button" onclick="window.removeArray1DRow(${idx})">✕</button></td>
 				`;
-			});
-			
-			document.getElementById('array1DSize').textContent = `(${values.length} Elemente)`;
-		}
-		
-		function render2DArray(values) {
-			const thead = document.getElementById('array2DHead');
-			const tbody = document.getElementById('array2DBody');
-			
-			if (!values.length) return;
-			
-			const cols = values[0].length;
-			const rows = values.length;
-			
-			thead.innerHTML = '<tr><th>Zeile</th>' + 
-				Array.from({length: cols}, (_, i) => `<th>Spalte ${i}</th>`).join('') +
-				'<th></th></tr>';
-			
-			tbody.innerHTML = '';
-			values.forEach((row, rowIdx) => {
-				const tr = tbody.insertRow();
-				tr.innerHTML = '<td>' + rowIdx + '</td>' +
-					row.map((val, colIdx) => `<td><input type="text" value="${val}" data-row="${rowIdx}" data-col="${colIdx}"></td>`).join('') +
-					`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
-			});
-			
-			document.getElementById('array2DSize').textContent = `(${rows}×${cols})`;
-		}
-		
-		window.addArray1DRow = function() {
-			const tbody = document.getElementById('array1DBody');
-			const idx = tbody.rows.length;
-			const row = tbody.insertRow();
-			row.innerHTML = `
-				<td>${idx}</td>
+				});
+
+				document.getElementById('array1DSize').textContent = `(${values.length} Elemente)`;
+			}
+
+			function render2DArray(values) {
+				const thead = document.getElementById('array2DHead');
+				const tbody = document.getElementById('array2DBody');
+
+				if (!values.length) return;
+
+				const cols = values[0].length;
+				const rows = values.length;
+
+				thead.innerHTML = '<tr><th>Zeile</th>' +
+					Array.from({ length: cols }, (_, i) => `<th>Spalte ${i + 1}</th>`).join('') +
+					'<th></th></tr>';
+
+				tbody.innerHTML = '';
+				values.forEach((row, rowIdx) => {
+					const tr = tbody.insertRow();
+					tr.innerHTML = '<td>' + (rowIdx + 1) + '</td>' +
+						row.map((val, colIdx) => `<td><input type="text" value="${val}" data-row="${rowIdx}" data-col="${colIdx}"></td>`).join('') +
+						`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
+				});
+
+				document.getElementById('array2DSize').textContent = `(${rows}×${cols})`;
+			}
+
+			window.addArray1DRow = function () {
+				const tbody = document.getElementById('array1DBody');
+				const idx = tbody.rows.length;
+				const row = tbody.insertRow();
+				row.innerHTML = `
+				<td>${idx + 1}</td>
 				<td><input type="text" value="0" data-index="${idx}"></td>
 				<td><button type="button" onclick="window.removeArray1DRow(${idx})">✕</button></td>
 			`;
-		};
-		
-		window.removeArray1DRow = function(idx) {
-			const tbody = document.getElementById('array1DBody');
-			tbody.deleteRow(idx);
-			Array.from(tbody.rows).forEach((row, newIdx) => {
-				row.cells[0].textContent = newIdx;
-				row.cells[1].querySelector('input').dataset.index = newIdx;
-			});
-		};
-		
-		window.addArray2DRow = function() {
-			const tbody = document.getElementById('array2DBody');
-			const cols = tbody.rows.length > 0 ? tbody.rows[0].cells.length - 2 : 1;
-			const rowIdx = tbody.rows.length;
-			
-			const tr = tbody.insertRow();
-			tr.innerHTML = '<td>' + rowIdx + '</td>' +
-				Array.from({length: cols}, (_, colIdx) => 
-					`<td><input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}"></td>`
-				).join('') +
-				`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
-		};
-		
-		window.addArray2DCol = function() {
-			const thead = document.getElementById('array2DHead');
-			const tbody = document.getElementById('array2DBody');
-			
-			if (!tbody.rows.length) {
-				window.addArray2DRow();
-				return;
-			}
-			
-			const colIdx = tbody.rows[0].cells.length - 2;
-			
-			const headerRow = thead.rows[0];
-			const th = document.createElement('th');
-			th.textContent = `Spalte ${colIdx}`;
-			headerRow.insertBefore(th, headerRow.lastChild);
-			
-			Array.from(tbody.rows).forEach((row, rowIdx) => {
-				const td = document.createElement('td');
-				td.innerHTML = `<input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}">`;
-				row.insertBefore(td, row.lastChild);
-			});
-		};
-		
-		window.removeArray2DRow = function(idx) {
-			const tbody = document.getElementById('array2DBody');
-			tbody.deleteRow(idx);
-		};
-		
-		window.saveArrayValues = async function() {
-			if (!currentArrayParam) return;
-			
-			const arrayType = document.getElementById('arrayTypeSelect').value;
-			let values = null;
-			
-			if (arrayType === '1D') {
-				const inputs = document.querySelectorAll('#array1DBody input');
-				values = Array.from(inputs).map(inp => inp.value);
-			} else if (arrayType === '2D') {
-				const tbody = document.getElementById('array2DBody');
-				values = Array.from(tbody.rows).map(row => 
-					Array.from(row.querySelectorAll('input')).map(inp => inp.value)
-				);
-			}
-			
-			try {
-				const response = await fetch(`${API_BASE_URL}/parameters/${currentArrayParam.id}`, {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						array_type: arrayType,
-						default_value_json: JSON.stringify(values)
-					})
+			};
+
+			window.removeArray1DRow = function (idx) {
+				const tbody = document.getElementById('array1DBody');
+				tbody.deleteRow(idx);
+				Array.from(tbody.rows).forEach((row, newIdx) => {
+					row.cells[0].textContent = newIdx + 1;
+					row.cells[1].querySelector('input').dataset.index = newIdx;
 				});
-				
-				if (response.ok) {
-					currentArrayParam.array_type = arrayType;
-					currentArrayParam.default_value_json = JSON.stringify(values);
-					await loadParameters(currentGdlObjectId);
-					window.closeArrayEditor();
-					statusMessage.textContent = 'Status: Array-Werte gespeichert.';
+			};
+
+			window.addArray2DRow = function () {
+				const tbody = document.getElementById('array2DBody');
+				const cols = tbody.rows.length > 0 ? tbody.rows[0].cells.length - 2 : 1;
+				const rowIdx = tbody.rows.length;
+
+				const tr = tbody.insertRow();
+				tr.innerHTML = '<td>' + (rowIdx + 1) + '</td>' +
+					Array.from({ length: cols }, (_, colIdx) =>
+						`<td><input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}"></td>`
+					).join('') +
+					`<td><button type="button" onclick="window.removeArray2DRow(${rowIdx})">✕</button></td>`;
+			};
+
+			window.addArray2DCol = function () {
+				const thead = document.getElementById('array2DHead');
+				const tbody = document.getElementById('array2DBody');
+
+				if (!tbody.rows.length) {
+					window.addArray2DRow();
+					return;
 				}
-			} catch (error) {
-				statusMessage.textContent = `Fehler: ${error.message}`;
+
+				const colIdx = tbody.rows[0].cells.length - 2;
+
+				const headerRow = thead.rows[0];
+				const th = document.createElement('th');
+				th.textContent = `Spalte ${colIdx + 1}`;
+				headerRow.insertBefore(th, headerRow.lastChild);
+
+				Array.from(tbody.rows).forEach((row, rowIdx) => {
+					const td = document.createElement('td');
+					td.innerHTML = `<input type="text" value="0" data-row="${rowIdx}" data-col="${colIdx}">`;
+					row.insertBefore(td, row.lastChild);
+				});
+			};
+
+			window.removeArray2DRow = function (idx) {
+				const tbody = document.getElementById('array2DBody');
+				tbody.deleteRow(idx);
+			};
+
+			window.saveArrayValues = async function () {
+				if (!currentArrayParam) return;
+
+				const arrayType = document.getElementById('arrayTypeSelect').value;
+				let values = null;
+
+				if (arrayType === '1D') {
+					const inputs = document.querySelectorAll('#array1DBody input');
+					values = Array.from(inputs).map(inp => inp.value);
+				} else if (arrayType === '2D') {
+					const tbody = document.getElementById('array2DBody');
+					values = Array.from(tbody.rows).map(row =>
+						Array.from(row.querySelectorAll('input')).map(inp => inp.value)
+					);
+				}
+
+				try {
+					const response = await fetch(`${API_BASE_URL}/parameters/${currentArrayParam.id}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							array_type: arrayType,
+							default_value_json: JSON.stringify(values)
+						})
+					});
+
+					if (response.ok) {
+						currentArrayParam.array_type = arrayType;
+						currentArrayParam.default_value_json = JSON.stringify(values);
+						await loadParameters(currentGdlObjectId);
+						window.closeArrayEditor();
+						statusMessage.textContent = 'Status: Array-Werte gespeichert.';
+						await triggerLocalExport();
+					}
+				} catch (error) {
+					statusMessage.textContent = `Fehler: ${error.message}`;
+				}
+			};
+
+			// Setup array button click handlers
+			document.addEventListener('click', function (e) {
+				if (e.target.classList.contains('array-edit-btn')) {
+					const paramId = e.target.dataset.paramId;
+					window.openArrayEditor(paramId);
+				}
+			});
+
+			// Event listeners for array editor
+			const arrayTypeSelect = document.getElementById('arrayTypeSelect');
+			if (arrayTypeSelect) {
+				arrayTypeSelect.addEventListener('change', updateArrayContainers);
 			}
-		};
-		
-		// Setup array button click handlers
-		document.addEventListener('click', function(e) {
-			if (e.target.classList.contains('array-edit-btn')) {
-				const paramId = e.target.dataset.paramId;
-				window.openArrayEditor(paramId);
+
+			// Listeners for array mode radios
+			document.querySelectorAll('input[name="arrayMode"]').forEach(radio => {
+				radio.addEventListener('change', updateArrayModeOptions);
+			});
+
+
+			async function triggerLocalExport() {
+				if (!currentGdlObjectId) return;
+				try {
+					const response = await fetch(`${API_BASE_URL}/objects/${currentGdlObjectId}/export`, {
+						method: 'POST'
+					});
+					const result = await response.json();
+					if (result.success) {
+						console.log('Local export successful');
+					} else {
+						console.error('Local export failed:', result.error);
+					}
+				} catch (e) {
+					console.error('Error triggering local export:', e);
+				}
 			}
 		});
-		
-		// Event listeners for array editor
-		const arrayTypeSelect = document.getElementById('arrayTypeSelect');
-		if (arrayTypeSelect) {
-			arrayTypeSelect.addEventListener('change', updateArrayContainers);
-		}
-
-	});
 	</script>
 
 
-	
+
 	<!-- Array Editor Modal -->
 	<div class="modal" id="arrayEditorModal">
 		<div class="modal-content" style="max-width: 900px;">
 			<div class="modal-header">
 				<h2 id="arrayEditorTitle">Array-Parameter Editor</h2>
 			</div>
-			
+
 			<div class="form-group">
 				<label>Parameter: <span id="arrayParamName"></span></label>
 			</div>
-			
+
 			<div class="form-group">
 				<label>Array-Typ:</label>
 				<select id="arrayTypeSelect">
@@ -1262,7 +3068,7 @@
 					<option value="2D">2D Array</option>
 				</select>
 			</div>
-			
+
 			<div class="form-group" id="arrayModeGroup">
 				<label>Werte-Modus:</label>
 				<div style="display: flex; gap: 20px; margin-top: 10px;">
@@ -1270,12 +3076,45 @@
 					<label><input type="radio" name="arrayMode" value="same"> Alle gleich</label>
 					<label><input type="radio" name="arrayMode" value="increment"> Hochzählend</label>
 				</div>
-				
-				<div id="arrayModeOptions" style="margin-top: 10px; display: none;">
-					<input type="text" id="arrayFillValue" placeholder="Wert für 'Alle gleich' oder Startwert für 'Hochzählend'" style="width: 100%;">
+
+				<!-- Mode Options Panel -->
+				<div id="arrayModeOptions"
+					style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; display: none;">
+					<!-- Mode "same" -->
+					<div id="modeSameContainer" style="display: none;">
+						<label>Wert für alle Felder:</label>
+						<div style="display: flex; gap: 10px; margin-top: 5px;">
+							<input type="text" id="arrayFillValue" placeholder="z.B. 100" style="flex: 1;">
+							<button type="button" class="btn btn-primary"
+								onclick="window.applyArrayAutoFill()">Anwenden</button>
+						</div>
+					</div>
+
+					<!-- Mode "increment" -->
+					<div id="modeIncrementContainer" style="display: none;">
+						<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+							<div>
+								<label>Startwert:</label>
+								<input type="text" id="arrayStartValue" placeholder="z.B. 0"
+									style="width: 100%; margin-top: 5px;">
+							</div>
+							<div>
+								<label>Formel (i = Index, s = Start):</label>
+								<input type="text" id="arrayFormula" placeholder="z.B. s+(i-1)*10"
+									style="width: 100%; margin-top: 5px;">
+							</div>
+						</div>
+						<div style="margin-top: 15px; text-align: right;">
+							<button type="button" class="btn btn-primary"
+								onclick="window.applyArrayAutoFill()">Anwenden</button>
+						</div>
+						<div style="font-size: 0.85em; color: #88c0d0; margin-top: 8px; font-style: italic;">
+							Hinweis: 'i' ist der 1-basierte Index (spaltenweise von oben nach unten), 's' der Startwert.
+						</div>
+					</div>
 				</div>
 			</div>
-			
+
 			<div id="array1DContainer" style="display: none;">
 				<h3>1D Array <span id="array1DSize"></span></h3>
 				<table class="array-table">
@@ -1290,7 +3129,7 @@
 				</table>
 				<button type="button" class="btn btn-secondary" onclick="addArray1DRow()">+ Zeile hinzufügen</button>
 			</div>
-			
+
 			<div id="array2DContainer" style="display: none;">
 				<h3>2D Array <span id="array2DSize"></span></h3>
 				<div style="overflow-x: auto;">
@@ -1300,11 +3139,13 @@
 					</table>
 				</div>
 				<div style="margin-top: 10px;">
-					<button type="button" class="btn btn-secondary" onclick="addArray2DRow()">+ Zeile hinzufügen</button>
-					<button type="button" class="btn btn-secondary" onclick="addArray2DCol()">+ Spalte hinzufügen</button>
+					<button type="button" class="btn btn-secondary" onclick="addArray2DRow()">+ Zeile
+						hinzufügen</button>
+					<button type="button" class="btn btn-secondary" onclick="addArray2DCol()">+ Spalte
+						hinzufügen</button>
 				</div>
 			</div>
-			
+
 			<div class="form-actions">
 				<button type="button" class="btn btn-secondary" onclick="closeArrayEditor()">Abbrechen</button>
 				<button type="button" class="btn btn-primary" onclick="saveArrayValues()">Speichern</button>
@@ -1313,5 +3154,5 @@
 	</div>
 
 </body>
-	</html>
 
+</html>

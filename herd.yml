@@ -1,0 +1,10 @@
+php: 8.4
+
+nginx:
+  locations:
+	- match: /backend/public
+	  root: backend/public
+	  try_files: "$uri $uri/ /backend/public/index.php?$query_string"
+	- match: /
+	  root: public
+	  try_files: "$uri $uri/ /index.php?$query_string"

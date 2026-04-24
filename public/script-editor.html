@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDL Workbench - Skript Editor</title>
+    <link rel="stylesheet" href="style.css?v=20260205">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="i18n.js"></script>
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <script src="gdl-monaco-config.js"></script>
+    <style>
+        .script-editor-page {
+            display: grid !important;
+            grid-template-columns: 200px 1fr 340px !important;
+        }
+        /* ── AI Chat Panel (Script Editor) ── */
+        .ai-chat-panel {
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--border-color);
+            background: var(--panel-bg);
+            overflow: hidden;
+            height: 100%;
+        }
+        .ai-chat-header {
+            padding: 12px 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ai-model-badge {
+            font-size: 0.68rem;
+            background: rgba(94,129,172,0.2);
+            color: var(--accent-color);
+            padding: 2px 7px;
+            border-radius: 10px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .ai-msg {
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .ai-msg.user {
+            background: rgba(94,129,172,0.18);
+            color: var(--text-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-msg.assistant {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .ai-msg.error { background: rgba(191,97,106,0.15); color: #bf616a; }
+        .ai-msg.thinking { color: var(--text-muted); font-style: italic; }
+        .ai-msg pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.25);
+            border-radius: 4px;
+            padding: 8px 10px;
+            overflow-x: auto;
+            white-space: pre;
+            margin-top: 6px;
+        }
+        .ai-msg code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            background: rgba(0,0,0,0.25);
+            border-radius: 3px;
+            padding: 1px 4px;
+        }
+        .ai-insert-btn {
+            margin-top: 7px;
+            font-size: 0.72rem;
+            background: rgba(94,129,172,0.2);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 3px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .ai-insert-btn:hover { background: rgba(94,129,172,0.35); }
+        .ai-input-area {
+            border-top: 1px solid var(--border-color);
+            padding: 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .ai-context-row {
+            display: flex;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            align-items: center;
+        }
+        .ai-context-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .ai-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+            resize: none;
+            min-height: 70px;
+            font-family: inherit;
+        }
+        .ai-textarea:focus { outline: none; border-color: var(--accent-color); }
+        .ai-send-row {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ai-send-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ai-send-btn:hover { opacity: 0.85; }
+        .ai-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .ai-clear-btn {
+            font-size: 0.75rem;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .ai-clear-btn:hover { border-color: var(--text-muted); color: var(--text-color); }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <span class="logo">GDL Workbench</span>
+                <span class="project-info" id="headerProjectName"><span data-i18n="project">Projekt</span>: -</span>
+                <span class="object-info" id="headerObjectName"><span data-i18n="object">Objekt</span>: -</span>
+            </div>
+            <div class="header-right">
+                <button class="header-btn primary" id="saveEditorBtn" title="Aktuelles Script in Datenbank speichern"
+                    data-i18n="save">
+                    <i class="fas fa-database"></i> Speichern
+                </button>
+                <span class="separator">|</span>
+                <div class="lang-switcher">
+                    <select>
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN NAVIGATION -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-button" data-i18n="nav_dashboard">Projektverwaltung</a>
+            <a href="object-selection.html" class="nav-button" data-i18n="nav_objects">Objektverwaltung</a>
+            <a href="param-management.html" class="nav-button" data-i18n="nav_params">Parameterverwaltung</a>
+            <a href="index.html" class="nav-button" data-i18n="nav_ui_designer">UI Designer</a>
+            <a href="script-editor.html" class="nav-button active" data-i18n="nav_scripts">Script Editor</a>
+            <a href="codeschmiede.html" class="nav-button" data-i18n="nav_codeschmiede">Codeschmiede</a>
+            <a href="build-tasks.html" class="nav-button" data-i18n="nav_build">Build Tasks</a>
+        </nav>
+
+        <!-- MAIN CONTENT AREA - Script Editor -->
+        <main class="app-main script-editor-page">
+            <aside class="left-panel">
+                <h3 data-i18n="gdl_scripts">GDL Skripte</h3>
+                <div class="config-section">
+                    <button class="action-btn script-btn" data-type="script_master"><i class="fas fa-code"></i> Master
+                        Script</button>
+                    <button class="action-btn script-btn" data-type="script_2d"><i class="fas fa-code"></i> 2D
+                        Script</button>
+                    <button class="action-btn script-btn" data-type="script_3d"><i class="fas fa-code"></i> 3D
+                        Script</button>
+                    <button class="action-btn script-btn" data-type="script_parameter"><i class="fas fa-code"></i>
+                        Parameter Script</button>
+                    <button class="action-btn script-btn" data-type="script_ui"><i class="fas fa-code"></i> Interface
+                        Script</button>
+                    <button class="action-btn script-btn" data-type="script_properties"><i class="fas fa-code"></i>
+                        Properties Script</button>
+                    <button class="action-btn script-btn" data-type="script_migration_forward"><i
+                            class="fas fa-code"></i> Forward Migration</button>
+                    <button class="action-btn script-btn" data-type="script_migration_backward"><i
+                            class="fas fa-code"></i> Backward Migration</button>
+                </div>
+
+                <h3 data-i18n="project_files">Projektdateien</h3>
+                <div class="config-section">
+                    <button class="action-btn script-btn" data-type="xml"><i class="fas fa-file-code"></i>
+                        Parameters.xml</button>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px;">
+                    <button id="exportToFilesBtn" class="action-btn primary"
+                        title="Alle Scripts und XML in lokale Dateien exportieren" data-i18n="update_all_files">
+                        <i class="fas fa-folder-open"></i> Alle Dateien aktualisieren
+                    </button>
+                    <button id="reloadFromFilesBtn" class="action-btn" title="Skripte von lokalen Dateien neu laden"
+                        style="margin-top: 10px;" data-i18n="reload_from_files">
+                        <i class="fas fa-sync-alt"></i> Reload from Files
+                    </button>
+                </div>
+            </aside>
+
+            <section class="central-panel">
+                <div id="editorInfoBar">
+                    <span data-i18n="file">Datei</span>: <span id="currentFileName">-</span>
+                </div>
+                <div id="monacoContainer"></div>
+            </section>
+
+            <!-- RIGHT: KI-Assistent -->
+            <aside class="ai-chat-panel">
+                <div class="ai-chat-header">
+                    <span><i class="fas fa-robot"></i>&nbsp; KI-Assistent</span>
+                    <select id="aiModelSelect" style="font-size:0.72rem;background:rgba(94,129,172,0.15);color:var(--accent-color);border:1px solid var(--accent-color);border-radius:8px;padding:2px 6px;cursor:pointer;">
+                        <option value="claude-3-haiku-20240307">Haiku 3 (verfügbar)</option>
+                        <option value="claude-3-5-haiku-20241022" disabled>Haiku 3.5 (mehr Guthaben nötig)</option>
+                        <option value="claude-3-5-sonnet-20241022" disabled>Sonnet 3.5 ★ (mehr Guthaben nötig)</option>
+                        <option value="claude-3-opus-20240229" disabled>Opus 3 (mehr Guthaben nötig)</option>
+                    </select>
+                </div>
+
+                <div class="ai-messages" id="aiMessages">
+                    <div class="ai-msg assistant">Hallo! Ich helfe Dir beim GDL-Programmieren. Du kannst das aktuelle Skript als Kontext mitsenden — einfach die Checkbox aktivieren.</div>
+                </div>
+
+                <div class="ai-input-area">
+                    <div class="ai-context-row">
+                        <span>Kontext:</span>
+                        <label><input type="checkbox" id="aiCtxCurrentScript" checked> Aktuelles Skript</label>
+                        <label><input type="checkbox" id="aiCtxParams"> Parameter</label>
+                    </div>
+                    <textarea class="ai-textarea" id="aiInput"
+                        placeholder="GDL-Frage oder Aufgabe beschreiben…&#10;&#10;Shift+Enter = neue Zeile&#10;Enter = Senden"
+                        rows="3"></textarea>
+                    <div class="ai-send-row">
+                        <button class="ai-clear-btn" id="aiClearBtn">
+                            <i class="fas fa-trash-alt"></i> Verlauf löschen
+                        </button>
+                        <button class="ai-send-btn" id="aiSendBtn">
+                            <i class="fas fa-paper-plane"></i> Senden
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <div class="footer-status" id="statusMessage" data-i18n="status_ready">Status: Bereit</div>
+        </footer>
+    </div>
+    <script src="script-editor.js?v=20260207"></script>
+</body>
+
+</html>

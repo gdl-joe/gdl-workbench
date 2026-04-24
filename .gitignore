@@ -1,3 +1,8 @@
+# Environment / Secrets
+.env
+backend/.env
+**/.env
+
 # Backups
 *.backup
 *.backup*
@@ -22,3 +27,6 @@ Thumbs.db
 # Temp
 /tmp/
 *.tmp
+
+# Embedded repos / Reste
+zz_reste/gdl-ui-studio_b/

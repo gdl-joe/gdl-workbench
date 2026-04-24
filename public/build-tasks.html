@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDL Workbench - Build Tasks</title>
+    <link rel="stylesheet" href="style.css?v=20260205">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="i18n.js"></script>
+    <style>
+        .tasks-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 160px);
+            padding: 20px;
+        }
+
+        .task-sidebar {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .task-group {
+            margin-bottom: 20px;
+        }
+
+        .task-group h3 {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .task-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .task-btn:hover {
+            background: var(--hover-color);
+            border-color: var(--primary-color);
+        }
+
+        .task-btn i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .console-panel {
+            background: #1e1e1e;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .console-header {
+            padding: 10px 15px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-title {
+            color: #d4d4d4;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        #consoleOutput {
+            flex: 1;
+            padding: 15px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #d4d4d4;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .console-actions button {
+            background: transparent;
+            border: none;
+            color: #d4d4d4;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .console-actions button:hover {
+            background: #3d3d3d;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-idle {
+            background: #333;
+            color: #aaa;
+        }
+
+        .status-running {
+            background: #007acc;
+            color: #fff;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-success {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .status-error {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .log-error {
+            color: #f14c4c;
+        }
+
+        .log-warn {
+            color: #cca700;
+        }
+
+        .log-info {
+            color: #3794ff;
+        }
+
+        .log-success {
+            color: #89d185;
+        }
+
+        .log-cmd {
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <span class="logo">GDL Workbench</span>
+                <span class="project-info" id="headerProjectName"><span data-i18n="project">Projekt</span>: -</span>
+                <span class="object-info" id="headerObjectName"><span data-i18n="object">Objekt</span>: -</span>
+            </div>
+            <div class="header-right">
+                <div class="status-info">
+                    <span id="taskStatusBadge" class="status-badge status-idle" data-i18n="status_ready">Bereit</span>
+                </div>
+                <div class="lang-switcher">
+                    <select>
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN NAVIGATION -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-button" data-i18n="nav_dashboard">Projektverwaltung</a>
+            <a href="object-selection.html" class="nav-button" data-i18n="nav_objects">Objektverwaltung</a>
+            <a href="param-management.html" class="nav-button" data-i18n="nav_params">Parameterverwaltung</a>
+            <a href="index.html" class="nav-button" data-i18n="nav_ui_designer">UI Designer</a>
+            <a href="script-editor.html" class="nav-button" data-i18n="nav_scripts">Skript Editor</a>
+            <a href="codeschmiede.html" class="nav-button" data-i18n="nav_codeschmiede">Codeschmiede</a>
+            <a href="build-tasks.html" class="nav-button active" data-i18n="nav_build">Build Tasks</a>
+        </nav>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="tasks-container">
+            <aside class="task-sidebar">
+                <div class="task-group">
+                    <h3 data-i18n="general_tasks">Allgemeine Tasks</h3>
+                    <button class="task-btn" data-task="x2g_all"><i class="fas fa-file-export"></i> <span
+                            data-i18n="task_x2g_all">XML zu GSM (Alle)</span></button>
+                    <button class="task-btn" data-task="g2x_all"><i class="fas fa-file-import"></i> <span
+                            data-i18n="task_g2x_all">GSM zu XML (Alle)</span></button>
+                    <button class="task-btn" data-task="lcf"><i class="fas fa-box"></i> <span data-i18n="task_lcf">LCF
+                            Container erstellen</span></button>
+                </div>
+
+                <div class="task-group">
+                    <h3 data-i18n="resources_images">Ressourcen & Bilder</h3>
+                    <button class="task-btn" data-task="images_all"><i class="fas fa-images"></i> <span
+                            data-i18n="task_images_all">Picture.xml aktualisieren</span></button>
+                    <button class="task-btn" data-task="svg2tiff"><i class="fas fa-vector-square"></i> <span
+                            data-i18n="task_svg2tiff">SVG zu TIFF konvertieren</span></button>
+                    <button class="task-btn" data-task="paramcsv_all"><i class="fas fa-table"></i> <span
+                            data-i18n="task_paramcsv_all">Parameter CSV Export</span></button>
+                </div>
+
+                <div class="task-group">
+                    <h3 data-i18n="hsf_conversion">HSF Konvertierung</h3>
+                    <button class="task-btn" data-task="g2h_all"><i class="fas fa-folder-open"></i> <span
+                            data-i18n="task_g2h_all">GSM zu HSF (Alle)</span></button>
+                    <button class="task-btn" data-task="h2g_all"><i class="fas fa-file-archive"></i> <span
+                            data-i18n="task_h2g_all">HSF zu GSM (Alle)</span></button>
+                </div>
+            </aside>
+
+            <section class="console-panel">
+                <div class="console-header">
+                    <span class="console-title" data-i18n="build_console">Build-Konsole</span>
+                    <div class="console-actions">
+                        <button id="clearConsole" title="Konsole leeren" data-i18n="clear_console"><i
+                                class="fas fa-trash"></i></button>
+                        <button id="copyConsole" title="Kopieren" data-i18n="copy"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div id="consoleOutput" data-i18n="console_welcome">Willkommen beim GDL-Task-Runner.
+                    Wählen Sie einen Task links aus, um die Ausführung zu starten.</div>
+            </section>
+        </main>
+    </div>
+
+    <script src="build-tasks.js?v=20260205"></script>
+</body>
+
+</html>

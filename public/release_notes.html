@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDL Workbench - Release Notes</title>
+    <link rel="stylesheet" href="style.css?v=20260131">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2e3440;
+            color: #d8dee9;
+            line-height: 1.6;
+            padding: 20px;
+            height: auto;
+            overflow: auto;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #3b4252;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #88c0d0;
+            border-bottom: 2px solid #4c566a;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #81a1c1;
+            margin-top: 30px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .date {
+            font-size: 0.9em;
+            color: #8899a6;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #88c0d0;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Release Notes</h1>
+
+        <h2>Version 1.6.0</h2>
+        <span class="date">23. Februar 2026 – Codeschmiede Update</span>
+        <ul>
+            <li><strong>Neue Seite: Codeschmiede (GDL Code Forge):</strong>
+                <ul>
+                    <li>Interaktives Werkzeug zur Generierung von GDL-Code-Bausteinen aus Eingabemasken.</li>
+                    <li>Drei Modi: Manuell, Aus Parametern, → Parameter (Variablen direkt als Parameter speichern).</li>
+                    <li>Mehrsprachige Navigation: i18n-Schlüssel <code>nav_codeschmiede</code> in allen 4 Sprachen ergänzt.</li>
+                </ul>
+            </li>
+            <li><strong>Feature: Befehlsbaum-Suche:</strong>
+                <ul>
+                    <li>Suchfeld im linken Panel filtert Befehle live nach Name, Kategorie oder Unterkategorie.</li>
+                    <li>"Keine Befehle gefunden"-Anzeige bei leerem Suchergebnis.</li>
+                </ul>
+            </li>
+            <li><strong>Feature: Snippets in MySQL-Datenbank:</strong>
+                <ul>
+                    <li>Snippets (gespeicherte Parametersätze) werden in der Datenbank gespeichert statt in localStorage.</li>
+                    <li>Neue Tabelle <code>codeschmiede_snippets</code> (Migration 003).</li>
+                    <li>Neuer PHP-Controller <code>CodeschmiedeController</code> mit GET / POST / DELETE Endpunkten.</li>
+                    <li>Snippets im Befehlsbaum mit Datum-Tooltip und Löschen-Button.</li>
+                </ul>
+            </li>
+            <li><strong>Neuer GDL-Befehl: POLY2_B – Polygon mit Bogenkanten:</strong>
+                <ul>
+                    <li>Beliebiges n-Eck mit gemischten geraden und gebogenen Kanten.</li>
+                    <li>Stichhöhe <code>z_poly[i] = 0</code> → gerade Kante; <code>≠ 0</code> → Bogenkante.</li>
+                    <li>Array-Parametertypen <code>length_array</code> / <code>integer_array</code> eingeführt.</li>
+                    <li>Funktion <code>resolveParamType()</code> für transparente Array-Erkennung im Formular.</li>
+                    <li>Modus "→ Parameter" legt Array-Parameter mit korrektem <code>array_type</code> und <code>array_first_dim</code> an.</li>
+                </ul>
+            </li>
+            <li><strong>Feature: Koordinaten-Tabelle (coord-table):</strong>
+                <ul>
+                    <li>Neuer Parametertyp <code>coord-table</code>: interaktive N×3-Tabelle für x/y/z-Koordinaten.</li>
+                    <li>Zeilen passen sich dynamisch an die Punktanzahl (<code>int_poly_n</code>) an.</li>
+                    <li>Spaltenköpfe aktualisieren sich live mit den Array-Variablennamen.</li>
+                    <li>Sitzungszustand (State) und Snippets speichern die Tabellenwerte als JSON.</li>
+                    <li>In Modus "Aus Parametern" ausgeblendet (Arrays kommen aus vorhandenen Parametern).</li>
+                </ul>
+            </li>
+            <li><strong>Code-Optimierung POLY2_B-Bogen-Script:</strong>
+                <ul>
+                    <li>Zwei Schleifen + GOSUB 12 + Subroutine zu einer einzigen Schleife zusammengefasst.</li>
+                    <li>Intermediate Arrays (<code>poly_dx[]</code>, <code>poly_dy[]</code>, <code>r2[]</code>, <code>xm[]</code>, <code>ym[]</code>) durch skalare Temp-Variablen ersetzt.</li>
+                    <li>Nur noch <code>arc_xm[]</code>, <code>arc_ym[]</code>, <code>arc_ang[]</code> als Arrays notwendig.</li>
+                    <li><code>DIM</code>-Deklaration für die Koordinaten-Arrays automatisch generiert.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Version 1.5.0</h2>
+        <span class="date">5. Februar 2026 - Stability & Branding Update</span>
+        <ul>
+            <li><strong>Rebranding: GDL Workbench:</strong>
+                <ul>
+                    <li>Anwendung umbenannt von "GDL-Code-Studio" zu "GDL Workbench".</li>
+                    <li>Alle UI-Elemente, Titel und Texte aktualisiert.</li>
+                </ul>
+            </li>
+            <li><strong>Kritischer Bugfix: Status-Persistierung:</strong>
+                <ul>
+                    <li>Behoben: Status- und Beschreibungsänderungen für Objekte wurden nicht gespeichert.</li>
+                    <li>Problem 1: <code>if ($status)</code> verhinderte Speicherung falsy Werte → geändert zu
+                        <code>isset($data['status'])</code>.</li>
+                    <li>Problem 2: Elvis-Operator <code>?:</code> konvertierte Werte zu 'active' → geändert zu
+                        Null-Coalescing <code>??</code>.</li>
+                    <li>Problem 3: Typ-Mismatch bei <code>project_id</code> (INT vs String) → SQL-Query auf
+                        <code>local_file_path LIKE</code> geändert.</li>
+                </ul>
+            </li>
+            <li><strong>UI-Vereinheitlichung:</strong>
+                <ul>
+                    <li>Header-Design über alle Seiten standardisiert (Dashboard, Objektverwaltung, Parameter, UI
+                        Designer, Skript Editor, Build Tasks).</li>
+                    <li>Projekt- und Objektnamen werden nun konsistent im Header angezeigt.</li>
+                </ul>
+            </li>
+            <li><strong>Sicherheitsverbesserungen:</strong>
+                <ul>
+                    <li>Entfernt: "Neues Objekt" und "Neues Projekt" Schaltflächen (Objekte werden nur in Archicad
+                        erstellt).</li>
+                    <li>Entfernt: Projekt- und Objekt-Löschfunktionen zur Vermeidung von Datenverlust.</li>
+                    <li>Entfernt: Duplizier-Funktionen zur Vermeidung unkontrollierter Ordnerstrukturen.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Version 1.4.0</h2>
+        <span class="date">5. Februar 2026 - GDL Power-Coding Update</span>
+        <ul>
+            <li><strong>Feature: Monaco Editor Integration:</strong>
+                <ul>
+                    <li>Professioneller Quelltext-Editor (VS Code Engine) direkt im Studio integriert.</li>
+                    <li>GDL-spezifisches Syntax Highlighting für Keywords, Kommentare und Operatoren.</li>
+                    <li>Smarte Editor-Funktionen wie Zeilennummern, Minimap und Auto-Layout.</li>
+                </ul>
+            </li>
+            <li><strong>Feature: Dedizierte Skript-Editor Seite:</strong>
+                <ul>
+                    <li>Neue Schaltzentrale in der Hauptnavigation für alle Skripte.</li>
+                    <li>Schneller Wechsel zwischen Master, 2D, 3D, UI, Parameter und Properties Skripten.</li>
+                    <li>Direkte Bearbeitung der <code>Parameters.xml</code> im Editor möglich.</li>
+                </ul>
+            </li>
+            <li><strong>Optimierungen:</strong>
+                <ul>
+                    <li>Vollbild-Layout: Der Editor nutzt nun die maximale Bildschirmbreite aus.</li>
+                    <li>"Export to Files" direkt auf der Editor-Seite für schnellen lokalen Sync.</li>
+                    <li>Bereinigung des UI-Designers: Quelltext-Bearbeitung nun übersichtlich an zentraler Stelle.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Version 1.3.0</h2>
+        <span class="date">2. Februar 2026 - Bugfix & Polish Update</span>
+        <ul>
+            <li><strong>Bugfix: Projekt-Löschung:</strong>
+                <ul>
+                    <li>Behoben: Datenbank-Projekte konnten nicht gelöscht werden (Type-Mismatch im Frontend).</li>
+                    <li>Cascading Delete funktioniert nun korrekt für Objekte, Parameter und Übersetzungen.</li>
+                </ul>
+            </li>
+            <li><strong>Bugfix: Export to Files:</strong>
+                <ul>
+                    <li>SQL-Fehler in <code>LocalExportService</code> behoben (falsche Spaltenbezeichnung).</li>
+                    <li>Parameter-Übersetzungen werden nun korrekt exportiert.</li>
+                    <li>Alle GDL-Scripte und Parameters.xml werden jetzt überschrieben.</li>
+                </ul>
+            </li>
+            <li><strong>Bugfix: Scripte aktualisieren:</strong>
+                <ul>
+                    <li>Funktion prüft nun korrekt, ob Objekt mit lokalen Dateien synchronisiert ist.</li>
+                    <li>Funktioniert jetzt auch für Datenbank-Objekte mit <code>is_local_sync</code>.</li>
+                </ul>
+            </li>
+            <li><strong>Feature: Bilder-Import:</strong>
+                <ul>
+                    <li>Beim Import lokaler Objekte werden nun auch Bilder und <code>manifest.json</code> kopiert.</li>
+                    <li>UI Designer zeigt importierte Bilder korrekt an.</li>
+                </ul>
+            </li>
+            <li><strong>UI Verbesserungen:</strong>
+                <ul>
+                    <li>Parameterverwaltung: Alle 7 Aktions-Schaltflächen haben nun einheitliche Größe und Farbe.</li>
+                    <li>Trennlinie zwischen Buttons entfernt für saubereres Design.</li>
+                </ul>
+            </li>
+            <li><strong>Datenbank-Schema:</strong>
+                <ul>
+                    <li>Fehlende <code>display_order</code> Spalte zu <code>parameters</code> Tabelle hinzugefügt.</li>
+                    <li>Spaltenname <code>param_id</code> in <code>parameter_translations</code> korrigiert.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Version 1.2.0</h2>
+        <span class="date">31. Januar 2026 - Das "Hybrid" Update</span>
+        <ul>
+            <li><strong>Feature: Lokaler Modus (Hybrid):</strong>
+                <ul>
+                    <li>Datenquellen-Umschalter (DB / Local) im Dashboard.</li>
+                    <li>Direktes Einlesen lokaler GDL-Projekte (.project Ordner) und Objekte.</li>
+                    <li>Laden der Parameter direkt aus der <code>Parameters.xml</code>.</li>
+                    <li>XML-Export der Parameter im lokalen Modus.</li>
+                </ul>
+            </li>
+            <li><strong>Neues Template:</strong> "Graphisoft Standard Navigation" (Reiter-basiert) hinzugefügt.</li>
+            <li><strong>UI & Layout:</strong>
+                <ul>
+                    <li>Grid-Layout auf max. 4 Spalten begrenzt für bessere Lesbarkeit.</li>
+                    <li>Responsive-Fixes für Dashboard und Objektauswahl.</li>
+                    <li>Dunkles Theme verfeinert (Header, Footer, Breadcrumbs).</li>
+                </ul>
+            </li>
+            <li><strong>Bugfixes:</strong>
+                <ul>
+                    <li>Regex-Fehler bei lokalen Pfaden in IDs behoben.</li>
+                    <li>Problem mit fehlenden Übersetzungen beim lokalen Laden gefixt.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Version 1.1.0</h2>
+        <span class="date">31. Januar 2026</span>
+        <ul>
+            <li>**Backend/Routing:** Fix für fest kodierte Pfade (Localhost/Folder-Structure) implementiert.
+                API-Base-Path wird nun dynamisch erkannt.</li>
+            <li>**Datenbank:** Config-Precedence-Problem mit .env Dateien behoben.</li>
+            <li>**UI/Dashboard:** Datumsanzeige inkludiert nun das Jahr. Header angepasst.</li>
+            <li>**UI/Objektauswahl:** Breadcrumbs Styling verbessert (Orange/Weiß), Header-Logo hinzugefügt.</li>
+            <li>**UI Designer:** Eigenschaften-Panel für UI_LINK Buttons bereinigt (Parameter-Feld ausgeblendet).</li>
+        </ul>
+
+        <a href="dashboard.html" class="back-link">← Zurück zum Dashboard</a>
+    </div>
+</body>
+
+</html>

@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>GDL-UI-Studio - UI Designer</title>
-	<link rel="stylesheet" href="style.css">
+	<title>GDL Workbench - UI Designer</title>
+	<link rel="stylesheet" href="style.css?v=20260128">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<!-- Monaco Editor Loader -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+	<script src="gdl-monaco-config.js"></script>
+	<script src="i18n.js"></script>
 </head>
+
 <body>
 	<div class="app-container">
 		<!-- HEADER -->
 		<header class="app-header">
 			<div class="header-left">
-				<span class="logo">GDL-UI-Studio</span>
-				<span class="project-name">Projekt: Mein_GDL_Objekt.gsm</span>
+				<span class="logo">GDL Workbench</span>
+				<span class="project-info" id="headerProjectName"><span data-i18n="project">Projekt</span>: -</span>
+				<span class="object-info" id="headerObjectName"><span data-i18n="object">Objekt</span>: -</span>
 			</div>
 			<div class="header-right">
-				<button class="header-btn">Neues Projekt</button>
-				<button class="header-btn">Laden</button>
-				<button class="header-btn">Speichern</button>
-				<span class="separator">|</span>
-				<button class="header-btn primary">GDL-Skripte generieren</button>
-				<button class="header-btn">Download</button>
+				<!-- Redundant header buttons removed per user request -->
 				<div class="lang-switcher">
 					<select>
 						<option value="de">Deutsch</option>
 						<option value="en">English</option>
+						<option value="fr">Français</option>
+						<option value="es">Español</option>
 					</select>
 				</div>
 			</div>
@@ -33,120 +38,346 @@
 
 		<!-- MAIN NAVIGATION -->
 		<nav class="main-nav">
-			<a href="index.html" class="nav-button active">UI Designer</a>
-			<a href="param-management.html" class="nav-button">Parameterverwaltung</a>
+			<a href="dashboard.html" class="nav-button" data-i18n="nav_dashboard">Projektverwaltung</a>
+			<a href="object-selection.html" class="nav-button" data-i18n="nav_objects">Objektverwaltung</a>
+			<a href="param-management.html" class="nav-button" data-i18n="nav_params">Parameterverwaltung</a>
+			<a href="index.html" class="nav-button" data-i18n="nav_ui_designer">UI Designer</a>
+			<a href="script-editor.html" class="nav-button" data-i18n="nav_scripts">Skript Editor</a>
+			<a href="codeschmiede.html" class="nav-button" data-i18n="nav_codeschmiede">Codeschmiede</a>
+			<a href="build-tasks.html" class="nav-button" data-i18n="nav_build">Build Tasks</a>
 		</nav>
 
 		<!-- MAIN CONTENT AREA - UI Designer -->
 		<main class="app-main ui-designer-page">
 			<aside class="left-panel">
-				<h3>UI-Elemente</h3>
-				<div class="toolbox-item"><span>UI_OUTFIELD</span></div>
-				<div class="toolbox-item"><span>UI_INFIELD</span></div>
-				<div class="toolbox-item"><span>UI_BUTTON</span></div>
-				<div class="toolbox-item"><span>UI_SEPARATOR</span></div>
-				<div class="toolbox-item"><span>UI_RADIO_BUTTON</span></div>
-				<div class="toolbox-item"><span>UI_CHECKBOX</span></div>
-				<div class="toolbox-item disabled">(UI_PICTURE - P2)</div>
+				<h3 data-i18n="config_title">UI-Konfiguration</h3>
+				<div class="config-section">
+					<label data-i18n="width">Breite (px):</label>
+					<input type="number" id="uiWidth" value="444" min="100" max="2000" step="1">
+					<label data-i18n="height">Höhe (px):</label>
+					<input type="number" id="uiHeight" value="266" min="100" max="2000" step="1">
+					<label data-i18n="page_count">Anzahl Seiten:</label>
+					<input type="number" id="pageCount" value="1" min="1" max="20" step="1">
+					<label data-i18n="platform">Plattform:</label>
+					<select id="platformSelect">
+						<option value="windows">Windows</option>
+						<option value="mac">Mac</option>
+					</select>
+					<label data-i18n="template">Template:</label>
+					<select id="templateSelect">
+						<!-- Options populated via JS -->
+					</select>
+					<button id="applyConfigBtn" class="config-btn" title="Konfiguration in Datenbank speichern"
+						data-i18n="apply">
+						<i class="fas fa-database"></i> Übernehmen
+					</button>
+				</div>
 
-				<h3>Layout</h3>
-				<div class="toolbox-item"><span>Leere Zeile</span></div>
-				<div class="toolbox-item disabled">(2-Sp. Zeile - P2)</div>
+				<h3 data-i18n="toolbox_title">UI-Elemente</h3>
+				<div class="toolbox-item" data-ui-type="UI_INFIELD" draggable="true">
+					<span data-i18n="ui_infield">UI_INFIELD</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_INFIELD_IMAGE" draggable="true">
+					<span data-i18n="ui_infield_image">UI_INFIELD mit Bild</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_OUTFIELD" draggable="true">
+					<span data-i18n="ui_outfield">UI_OUTFIELD</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_BUTTON" draggable="true">
+					<span data-i18n="ui_button">UI_BUTTON UI_LINK</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_SEPARATOR" draggable="true">
+					<span data-i18n="ui_separator">UI_SEPARATOR</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_RADIOBUTTON" draggable="true">
+					<span data-i18n="ui_radiobutton">UI_RADIOBUTTON</span>
+				</div>
+				<div class="toolbox-item" data-ui-type="UI_PICT" draggable="true">
+					<span data-i18n="ui_pict">UI_PICT</span>
+				</div>
 			</aside>
 
 			<section class="central-panel">
-				<div class="canvas-container">
-					<div class="ui-dialog-frame" style="width: 444px; height: 266px;">
-						<div class="tab-bar">
-							<button class="tab-button active">Allgemein</button>
-							<button class="tab-button">Multi-Einträge</button>
-							<button class="tab-button">Text + Rahmen</button>
-							<button class="tab-button">Zeiger + Pfeil</button>
-						</div>
-						<div class="current-page-content">
-							<div class="ui-element-mockup" style="top: 45px; left: 10px; width: 150px; height: 24px;">
-								<span class="ui-outfield-label">Import: Dateiname</span>
+				<div class="canvas-wrapper">
+					<!-- Maßstabsleisten werden hier dynamisch eingefügt -->
+					<div class="canvas-container">
+						<div class="ui-dialog-frame" id="uiDialogFrame" style="width: 444px; height: 266px;">
+							<div class="tab-bar" id="tabBar">
+								<button class="tab-button active" data-page="0"><span data-i18n="page_short">S.</span>
+									1</button>
 							</div>
-							<div class="ui-element-mockup draggable resizable selected" style="top: 45px; left: 170px; width: 200px; height: 24px;">
-								<input type="text" value="filename" class="ui-infield-input">
-								<div class="handle top-left"></div>
-								<div class="handle top-right"></div>
-								<div class="handle bottom-left"></div>
-								<div class="handle bottom-right"></div>
-								<div class="handle top"></div>
-								<div class="handle bottom"></div>
-								<div class="handle left"></div>
-								<div class="handle right"></div>
-							</div>
-
-							<div class="ui-element-mockup" style="top: 75px; left: 10px; width: 150px; height: 24px;">
-								<span class="ui-outfield-label">Kategorie der Auswahl</span>
-							</div>
-							<div class="ui-element-mockup draggable resizable" style="top: 75px; left: 170px; width: 200px; height: 24px;">
-								<input type="text" value="str_kat_input" class="ui-infield-input">
-								<div class="handle top-left"></div>
-								<div class="handle top-right"></div>
-								<div class="handle bottom-left"></div>
-								<div class="handle bottom-right"></div>
-								<div class="handle top"></div>
-								<div class="handle bottom"></div>
-								<div class="handle left"></div>
-								<div class="handle right"></div>
-							</div>
-
-							<div class="ui-element-mockup draggable resizable" style="top: 105px; left: 10px; width: 360px; height: 24px; border: 1px solid #ccc; background-color: #f0f0f0;">
-								<span style="display: block; text-align: center; line-height: 24px; color: #888;">UI_SEPARATOR (Placeholder)</span>
-								<div class="handle top-left"></div>
-								<div class="handle top-right"></div>
-								<div class="handle bottom-left"></div>
-								<div class="handle bottom-right"></div>
-								<div class="handle top"></div>
-								<div class="handle bottom"></div>
-								<div class="handle left"></div>
-								<div class="handle right"></div>
+							<div class="current-page-content" id="pageContent">
+								<!-- UI-Elemente werden hier dynamisch eingefügt -->
 							</div>
 						</div>
 					</div>
+					<!-- Subtabs des Web-UI: unterhalb der horizontalen Maßstabsleiste -->
+					<div class="sub-tab-bar" id="subTabBar"></div>
+				</div>
+
+				<!-- GDL Code Editor Panel (Initially Hidden) -->
+				<div id="editorOverlay" class="editor-overlay hidden">
+					<div class="editor-header">
+						<span id="editorTitle">GDL Editor</span>
+						<div class="editor-actions">
+							<button id="saveEditorBtn" class="header-btn primary"><i class="fas fa-save"></i> In Canvas
+								übernehmen</button>
+							<button id="closeEditorBtn" class="header-btn"><i class="fas fa-times"></i>
+								<span data-i18n="close">Schließen</span></button>
+						</div>
+					</div>
+					<div id="monacoContainer" style="width: 100%; height: calc(100% - 40px);"></div>
 				</div>
 			</section>
 
 			<aside class="right-panel">
-				<h3>Seite</h3>
-				<select class="page-select">
-					<option>Allgemein</option>
-					<option>Multi-Einträge</option>
-					<option>Text + Rahmen</option>
-					<option>Zeiger + Pfeil</option>
+				<h3 data-i18n="page">Seite</h3>
+				<select class="page-select" id="pageSelect">
+					<option value="0" data-i18n="page_short">S. 1</option>
 				</select>
+				<button id="addPageBtn" class="config-btn" data-i18n="add_page">+ Seite hinzufügen</button>
 
-				<h3>Eigenschaften</h3>
-				<div class="properties-section">
-					<label>Typ:</label><span>UI_INFIELD</span>
-					<label>Name:</label><input type="text" value="filename">
-					<label>Beschriftung:</label><input type="text" value="Import: Dateiname">
-					<label>GDL-Parameter:</label>
-					<select>
-						<option>filename</option>
-						<option>str_kat_input</option>
-						<option>str_kat_use</option>
-						<option>int_anzeige</option>
-					</select>
-					<label>Breite:</label><input type="number" value="200">
-					<label>Höhe:</label><input type="number" value="24">
-					<div class="language-input">
-						<label>Beschriftung (DE):</label><input type="text" value="Import: Dateiname">
-						<label>Beschriftung (EN):</label><input type="text" value="Import: Filename">
+				<h3 id="propHeader" class="hidden" data-i18n="properties_title">Eigenschaften</h3>
+				<div class="properties-section" id="propertiesSection">
+					<div class="no-selection">
+						<p data-i18n="no_selection">Kein Element ausgewählt</p>
+						<p class="hint" data-i18n="drag_hint">Ziehen Sie ein Element aus der Toolbox auf den Canvas</p>
+					</div>
+					<div class="element-properties hidden" id="elementProperties">
+						<label data-i18n="type">Typ:</label><span id="propType">-</span>
+
+						<!-- UI_INFIELD spezifisch -->
+						<div id="infieldProps">
+							<!-- Parameter-Name ausgeblendet wie angefordert -->
+							<div style="display:none;">
+								<label>Parameter-Name:</label>
+								<input type="text" id="propParamName" placeholder="z.B. A">
+							</div>
+							<label data-i18n="gdl_param">GDL-Parameter:</label>
+							<select id="propGdlParam">
+								<option value="">-- Kein Parameter --</option>
+							</select>
+
+							<!-- Parameter-Wert Feld -->
+							<div id="paramValueContainer" style="display: none; margin-top: 10px;">
+								<label data-i18n="param_value">Parameter-Wert:</label>
+								<!-- Dropdown für VALUES/VALUES2 -->
+								<select id="propParamValueSelect" style="display: none;">
+								</select>
+								<!-- Checkbox für Boolean -->
+								<input type="checkbox" id="propParamValueCheckbox" style="display: none;">
+								<!-- Textfeld für andere Typen -->
+								<input type="text" id="propParamValueText" style="display: none;" placeholder="Wert">
+							</div>
+						</div>
+
+						<!-- UI_INFIELD_IMAGE spezifisch -->
+						<div id="infieldImageProps">
+							<label>GDL-Parameter:</label>
+							<select id="propGdlParamImage">
+								<option value="">-- Kein Parameter --</option>
+							</select>
+
+							<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #4c566a;">
+								<label style="font-weight: bold; color: #88c0d0;"
+									data-i18n="img_settings">Bildauswahl-Einstellungen</label>
+
+								<label data-i18n="img_method">Methode (1-8):</label>
+								<input type="number" id="propImageMethod" min="1" max="8" value="2">
+
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+									<div>
+										<label data-i18n="img_count">Bilderanzahl:</label>
+										<input type="number" id="propImageCount" min="1" max="20" value="3">
+									</div>
+									<div>
+										<label data-i18n="img_rows">Reihen:</label>
+										<input type="number" id="propImageRows" min="1" max="10" value="3">
+									</div>
+								</div>
+
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+									<div>
+										<label>zelleX:</label>
+										<input type="number" id="propCellX" min="1" value="30">
+									</div>
+									<div>
+										<label>zelleY:</label>
+										<input type="number" id="propCellY" min="1" value="30">
+									</div>
+								</div>
+
+								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+									<div>
+										<label>bildX:</label>
+										<input type="number" id="propImageX" min="1" value="30">
+									</div>
+									<div>
+										<label>bildY:</label>
+										<input type="number" id="propImageY" min="1" value="30">
+									</div>
+								</div>
+
+								<div style="margin-top: 10px;">
+									<label data-i18n="first_img">Anzeigebild (erstes):</label>
+									<select id="propFirstImage">
+										<option value="">-- Kein Bild --</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<!-- UI_RADIOBUTTON spezifisch -->
+						<div id="radiobuttonProps">
+							<label data-i18n="gdl_param">GDL-Parameter:</label>
+							<select id="propRadioParam">
+								<option value="">-- Kein Parameter --</option>
+							</select>
+							<label data-i18n="radio_val">Radio-Wert (wert):</label>
+							<input type="text" id="propRadioValue" placeholder="z.B. 1">
+							<label data-i18n="radio_text">Anzeige-Text (text):</label>
+							<input type="text" id="propRadioText" placeholder="z.B. Floor Plan">
+						</div>
+
+						<!-- UI_STYLE (für beide Typen) -->
+						<div id="uiStyleProps">
+							<label data-i18n="ui_style">UI_STYLE:</label>
+							<select id="propUiStyle">
+								<option value="0,0">Style 0,0 (Höhe 16px, Arial bold 11)</option>
+								<option value="0,1">Style 0,1 (Höhe 16px, Arial black 11)</option>
+								<option value="1,0">Style 1,0 (Höhe 11px, Arial bold 9)</option>
+								<option value="1,1">Style 1,1 (Höhe 11px, Arial black 9)</option>
+								<option value="2,0" selected>Style 2,0 (Höhe 20px, Arial bold 11)</option>
+								<option value="2,1">Style 2,1 (Höhe 20px, Arial bold 11)</option>
+							</select>
+						</div>
+
+						<!-- UI_OUTFIELD spezifisch -->
+						<div id="outfieldProps">
+							<label data-i18n="text">Text:</label>
+							<input type="text" id="propOutfieldText" data-i18n="text" placeholder="Text oder Variable">
+							<label data-i18n="alignment">Text-Ausrichtung:</label>
+							<select id="propTextAlign">
+								<option value="0" data-i18n="align_left">Linksbündig</option>
+								<option value="1" data-i18n="align_right">Rechtsbündig</option>
+							</select>
+							<label>
+								<input type="checkbox" id="propTextGrayed"> <span data-i18n="grayed_text">Ausgegrauter
+									Text</span>
+							</label>
+						</div>
+
+						<!-- UI_SEPARATOR spezifisch (Nutzt Standard Position/Größe) -->
+						<div id="separatorProps"></div>
+
+						<div id="buttonProps">
+							<label data-i18n="button_text">Button-Text:</label>
+							<input type="text" id="propButtonText" data-i18n="button_text"
+								placeholder="Text auf Button">
+							<label style="display:none;">Parameter (optional):</label>
+							<select id="propButtonParam" style="display:none;">
+								<option value="">-- Kein Parameter --</option>
+							</select>
+							<label data-i18n="id">ID:</label>
+							<input type="number" id="propButtonId" min="0" placeholder="z.B. 100">
+							<label data-i18n="url">URL:</label>
+							<input type="text" id="propButtonUrl" placeholder="https://...">
+							<label data-i18n="tooltip">Tooltip:</label>
+							<input type="text" id="propButtonTooltip" data-i18n="tooltip" placeholder="Tooltip Text">
+						</div>
+
+						<!-- UI_PICT spezifisch -->
+						<div id="pictProps">
+							<label data-i18n="image">Bild:</label>
+							<div style="display: flex; gap: 5px;">
+								<button id="selectPictImageBtn" class="config-btn" style="flex: 1;"
+									data-i18n="select_image">
+									📷 Bild auswählen
+								</button>
+								<button id="refreshImagesBtn" title="Bilder-Liste neu laden" style="padding: 0 5px;">
+									<i class="fas fa-sync-alt"></i>
+								</button>
+							</div>
+							<div id="selectedPictImagePreview"
+								style="display: none; margin-top: 10px; text-align: center;">
+								<img id="selectedPictImageThumb"
+									style="max-width: 100%; max-height: 100px; border: 1px solid #4c566a; border-radius: 4px;">
+								<div id="selectedPictImageName"
+									style="font-size: 11px; color: #d8dee9; margin-top: 5px;"></div>
+							</div>
+							<label data-i18n="mask">Maske:</label>
+							<select id="propPictMask">
+								<option value="0">0 (Normal)</option>
+								<option value="1">1 (Transparent)</option>
+							</select>
+							<label>
+								<input type="checkbox" id="propPictAutoDetect"> <span
+									data-i18n="use_original_size">Originalgröße verwenden</span>
+							</label>
+						</div>
+
+						<label data-i18n="pos_x">Position X (px):</label>
+						<input type="number" id="propPosX" min="0" step="1">
+						<label data-i18n="pos_y">Position Y (px):</label>
+						<input type="number" id="propPosY" min="0" step="1">
+						<label data-i18n="width">Breite (px):</label>
+						<input type="number" id="propWidth" min="0" step="1">
+						<label data-i18n="height">Höhe (px):</label>
+						<input type="number" id="propHeight" min="0" step="1">
+						<button id="deleteElementBtn" class="delete-btn" data-i18n="delete_element">Element
+							löschen</button>
 					</div>
 				</div>
 			</aside>
 		</main>
 
 		<!-- FOOTER -->
+		<!-- FOOTER -->
 		<footer class="app-footer">
-			<span class="status-message">Status: Projekt geladen.</span>
-			<span class="grid-info">Gitter: 10px</span>
-			<span class="zoom-info">Zoom: 100%</span>
+			<div class="footer-status" id="footerStatus"><span data-i18n="status">Status</span>: <span
+					data-i18n="ready">Bereit</span></div>
+
+			<div class="guide-controls">
+				<div class="guide-group">
+					<span class="guide-label">X-Achsen:</span>
+					<div class="guide-inputs">
+						<input type="number" class="guide-input" data-axis="x" data-index="0" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="1" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="2" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="3" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="4" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="5" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="6" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="7" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="8" placeholder="0">
+						<input type="number" class="guide-input" data-axis="x" data-index="9" placeholder="0">
+					</div>
+				</div>
+				<div class="guide-group">
+					<span class="guide-label">Y-Achsen:</span>
+					<div class="guide-inputs">
+						<input type="number" class="guide-input" data-axis="y" data-index="0" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="1" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="2" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="3" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="4" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="5" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="6" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="7" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="8" placeholder="0">
+						<input type="number" class="guide-input" data-axis="y" data-index="9" placeholder="0">
+					</div>
+				</div>
+			</div>
+
+			<div class="zoom-info">
+				<span data-i18n="zoom">Zoom</span>: <span id="zoomLabel">100%</span>
+				<input type="range" id="zoomSlider" min="100" max="400" value="100" step="10"> </span>
 		</footer>
 	</div>
+	<script src="templates/Template-b-prisma.js?v=20260128"></script>
+	<script src="templates/Template-c-standard.js?v=20260131"></script>
+	<script src="ui-designer.js?v=20260207"></script>
 </body>
+
 </html>

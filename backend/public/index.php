@@ -14,6 +14,7 @@ if (file_exists(__DIR__ . '/../.env')) {
 	$dotenv->load();
 }
 
+
 $containerBuilder = new ContainerBuilder();
 $definitions = require __DIR__ . '/../config/config.php';
 $definitions($containerBuilder);
@@ -22,7 +23,10 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 
 $app = AppFactory::create();
-$app->setBasePath('/gdl-ui-studio/backend/public');
+// Automatische Base-Path Erkennung
+$scriptName = $_SERVER['SCRIPT_NAME']; // z.B. /unterordner/backend/public/index.php
+$basePath = dirname($scriptName); // z.B. /unterordner/backend/public
+$app->setBasePath($basePath);
 
 // WICHTIG: CORS muss VOR Error Middleware kommen!
 $app->add(function (Request $request, RequestHandler $handler): Response {
@@ -37,6 +41,9 @@ $app->add(function (Request $request, RequestHandler $handler): Response {
 $app->options('/{routes:.+}', function (Request $request, Response $response): Response {
 	return $response;
 });
+
+// Body Parsing Middleware
+$app->addBodyParsingMiddleware();
 
 // Error Middleware NACH CORS
 $app->addErrorMiddleware(true, true, true);

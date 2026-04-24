@@ -9,10 +9,14 @@ return function (ContainerBuilder $containerBuilder) {
 	// Hier werden sie als "Werte" in den Container gelegt
 	$containerBuilder->addDefinitions([
 		// Diese Parameter sind jetzt für den Container als Werte verfügbar
-		'db.host' => $_ENV['DB_HOST'] ?? 'localhost',
-		'db.name' => $_ENV['DB_NAME'] ?? 'gdl_ui_studio_db',
+		'db.host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
+		'db.port' => $_ENV['DB_PORT'] ?? 3306,
+		'db.name' => $_ENV['DB_NAME'] ?? 'gdl-workbench',
 		'db.user' => $_ENV['DB_USER'] ?? 'root',
-		'db.password' => $_ENV['DB_PASSWORD'] ?? 'root',
+		'db.password' => $_ENV['DB_PASSWORD'] ?? '',
+
+		// Local Workspace Root
+		'local.workspace.root' => '/Users/Jochen/Documents/1_GDL_DEVELOP',
 
 		// ###############################################################
 		// ANPASSUNG: Die PDO-Instanz direkt hier als Factory-Closure definieren
@@ -20,7 +24,7 @@ return function (ContainerBuilder $containerBuilder) {
 		// PHP-DI versteht das so am besten.
 		// ###############################################################
 		\PDO::class => function (ContainerInterface $c) { // <<< Wichtig: PDO::class als Key!
-			$dsn = "mysql:host={$c->get('db.host')};dbname={$c->get('db.name')};charset=utf8mb4";
+			$dsn = "mysql:host={$c->get('db.host')};port={$c->get('db.port')};dbname={$c->get('db.name')};charset=utf8mb4";
 			$pdo = new PDO($dsn, $c->get('db.user'), $c->get('db.password'));
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDL Workbench - Codeschmiede</title>
+    <link rel="stylesheet" href="style.css?v=20260222">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="i18n.js"></script>
+    <style>
+        .codeschmiede-container {
+            display: grid;
+            grid-template-columns: 270px 1fr 360px;
+            height: calc(100vh - 160px);
+            overflow: hidden;
+        }
+
+        /* ── Left panel ── */
+        .cmd-tree-panel {
+            background: var(--panel-bg);
+            border-right: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .cmd-tree-panel > h3 {
+            margin: 0;
+            padding: 12px 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        /* ── Tree search ── */
+        .tree-search-wrap {
+            position: relative;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .tree-search {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 5px 26px 5px 9px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+        .tree-search:focus { outline: none; border-color: var(--accent-color); }
+        .tree-search-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            pointer-events: none;
+        }
+        .tree-no-results {
+            padding: 18px 15px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-align: center;
+            display: none;
+        }
+
+        /* scrollable tree area */
+        #commandTree {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* ── Command tree items ── */
+        .cmd-category { border-bottom: 1px solid var(--border-color); }
+
+        .cmd-cat-header {
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+        .cmd-cat-header:hover { background: rgba(255,255,255,0.04); }
+        .cmd-cat-header .arrow { font-size: 0.65rem; transition: transform 0.2s; }
+        .cmd-cat-header.collapsed .arrow { transform: rotate(-90deg); }
+
+        .cmd-subcategory { padding-left: 10px; }
+
+        .cmd-subcat-header {
+            padding: 6px 15px;
+            font-size: 0.78rem;
+            color: var(--text-secondary, #b0b0b0);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cmd-item {
+            padding: 8px 15px 8px 28px;
+            font-size: 0.83rem;
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 2px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .cmd-item:hover { background: rgba(136, 192, 208, 0.12); color: var(--accent-color); }
+        .cmd-item.active {
+            background: rgba(94, 129, 172, 0.28);
+            color: var(--accent-color);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 25px;
+        }
+        .cmd-item i { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* saved snippets in tree */
+        .cmd-snippet {
+            padding: 6px 10px 6px 36px;
+            font-size: 0.78rem;
+            color: var(--text-secondary, #b0b0b0);
+            margin: 1px 8px;
+            justify-content: space-between;
+        }
+        .cmd-snippet:hover { background: rgba(235, 203, 139, 0.08); color: #ebcb8b; }
+        .cmd-snippet .snip-label { flex: 1; }
+        .snip-delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.15s, color 0.15s;
+        }
+        .cmd-snippet:hover .snip-delete-btn { opacity: 1; }
+        .snip-delete-btn:hover { color: #bf616a; }
+
+        /* ── Globals panel (bottom of left sidebar) ── */
+        .globals-panel {
+            flex-shrink: 0;
+            border-top: 2px solid var(--border-color);
+            background: var(--panel-bg);
+        }
+
+        .globals-header {
+            padding: 9px 15px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary, #b0b0b0);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            background: rgba(0,0,0,0.15);
+        }
+        .globals-header:hover { background: rgba(0,0,0,0.25); }
+        .globals-header .g-arrow { font-size: 0.6rem; margin-left: auto; transition: transform 0.2s; }
+        .globals-header.collapsed .g-arrow { transform: rotate(-90deg); }
+
+        .globals-body {
+            padding: 10px 14px 12px;
+        }
+
+        .global-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .global-row:last-child { margin-bottom: 0; }
+
+        .global-row label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            min-width: 110px;
+            flex-shrink: 0;
+        }
+
+        .global-input {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.82rem;
+            font-family: 'JetBrains Mono', monospace;
+            width: 90px;
+        }
+        .global-input:focus { outline: none; border-color: var(--accent-color); }
+
+        .global-info-val {
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-color);
+            opacity: 0.7;
+        }
+
+        /* ── Form additions for var-value and section types ── */
+        .form-section-header {
+            grid-column: 1 / -1;
+            padding: 5px 0 3px;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .form-section-header:first-child { margin-top: 0; }
+
+        .form-var-value .var-value-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .form-var-value .var-value-row .vv-name {
+            flex: 2;
+            min-width: 0;
+        }
+        .form-var-value .var-value-row .vv-val {
+            flex: 1;
+            min-width: 40px;
+        }
+        .var-equals {
+            color: var(--text-muted);
+            font-family: monospace;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* ── Coordinate input table ── */
+        .coord-table-wrap {
+            grid-column: 1 / -1;
+            margin-top: 2px;
+        }
+        .coord-table-wrap > label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-secondary, #b0b0b0);
+            margin-bottom: 5px;
+            display: block;
+        }
+        .coord-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.81rem;
+        }
+        .coord-table th {
+            background: var(--header-bg);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 0.71rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            letter-spacing: 0.04em;
+        }
+        .coord-table td {
+            border: 1px solid var(--border-color);
+            padding: 0;
+        }
+        .coord-table td.ct-i {
+            width: 28px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.69rem;
+            background: rgba(0,0,0,0.12);
+            user-select: none;
+            padding: 3px 2px;
+        }
+        .ct-inp {
+            width: 100%;
+            box-sizing: border-box;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            padding: 4px 7px;
+            font-family: inherit;
+            font-size: inherit;
+            text-align: right;
+        }
+        .ct-inp:focus {
+            outline: none;
+            background: rgba(94, 129, 172, 0.12);
+        }
+
+        /* ── Querschnitt-Favorit loader ── */
+        .querschnitt-loader {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            padding: 7px 10px;
+            background: rgba(94, 129, 172, 0.08);
+            border: 1px solid rgba(94, 129, 172, 0.25);
+            border-radius: 6px;
+        }
+        .ql-label {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .ql-select {
+            flex: 1;
+            background: var(--input-bg, #2e3440);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-color);
+            font-size: 0.8rem;
+            padding: 3px 6px;
+        }
+        .ql-btn {
+            background: rgba(94, 129, 172, 0.2);
+            border: 1px solid rgba(94, 129, 172, 0.4);
+            border-radius: 4px;
+            color: var(--text-color);
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .ql-btn:hover {
+            background: rgba(94, 129, 172, 0.35);
+        }
+
+        /* ── Workspace (right side) – horizontal split ── */
+        .cmd-workspace {
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
+
+        .cmd-params-panel {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: 20px 25px 16px;
+            background: var(--bg-color);
+            border-right: 2px solid var(--border-color);
+        }
+
+        /* placeholder */
+        .cmd-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 110px;
+            color: var(--text-muted);
+            gap: 10px;
+            text-align: center;
+        }
+        .cmd-placeholder i { font-size: 2.2rem; color: var(--border-color); }
+        .cmd-placeholder p { font-size: 0.83rem; margin: 0; line-height: 1.6; }
+
+        /* command header */
+        .cmd-header { margin-bottom: 14px; }
+        .cmd-header h2 { margin: 0 0 3px; font-size: 1rem; color: var(--text-color); }
+        .cmd-path { font-size: 0.7rem; font-family: monospace; color: var(--text-muted); margin-bottom: 3px; }
+        .cmd-description { font-size: 0.81rem; color: var(--text-secondary, #b0b0b0); margin: 0; line-height: 1.5; }
+
+        /* param form */
+        .cmd-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 13px;
+            margin: 14px 0 16px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+
+        .form-group label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-secondary, #b0b0b0);
+        }
+
+        .form-group input,
+        .form-group select {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 9px;
+            border-radius: 4px;
+            font-size: 0.87rem;
+            transition: border-color 0.15s;
+        }
+        .form-group input:focus,
+        .form-group select:focus { outline: none; border-color: var(--accent-color); }
+
+        .form-group .hint { font-size: 0.68rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* ── Mode selector ── */
+        .mode-selector {
+            display: flex;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 7px 10px;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.76rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .mode-btn:last-child { border-right: none; }
+        .mode-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-color); }
+        .mode-btn.active { background: var(--button-bg); color: #fff; }
+        .mode-btn.active i { color: #fff; }
+
+        /* ── Declare-to-params action strip ── */
+        .declare-actions {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .declare-actions .note {
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        /* ── Params-mode empty notice ── */
+        .params-notice {
+            grid-column: 1 / -1;
+            padding: 10px 12px;
+            background: rgba(235,203,139,0.08);
+            border: 1px solid rgba(235,203,139,0.25);
+            border-radius: 4px;
+            font-size: 0.78rem;
+            color: #ebcb8b;
+        }
+
+        /* ── generate / action row ── */
+        .generate-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .clear-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            font-size: 0.82rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .clear-btn:hover { border-color: #bf616a; color: #bf616a; background: rgba(191, 97, 106, 0.08); }
+
+        .snippet-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 14px;
+            font-size: 0.82rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary, #b0b0b0);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .snippet-btn:hover { border-color: #ebcb8b; color: #ebcb8b; background: rgba(235, 203, 139, 0.08); }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.68rem;
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 3px 9px;
+            border-radius: 10px;
+        }
+        .live-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* ── Code Preview ── */
+        .cmd-preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #1e1e1e;
+        }
+
+        .preview-header {
+            padding: 8px 13px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .preview-header > span { flex: 1; color: #aaa; font-size: 0.8rem; }
+
+        .preview-btn {
+            padding: 5px 11px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #383838;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.77rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .preview-btn:hover { background: #4a4a4a; border-color: #666; }
+        .preview-btn.primary { background: var(--button-bg); border-color: var(--button-bg); color: #fff; }
+        .preview-btn.primary:hover { background: var(--button-hover-bg); }
+
+        #codePreview {
+            flex: 1;
+            margin: 0;
+            padding: 15px 18px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.84rem;
+            color: #d4d4d4;
+            overflow-y: auto;
+            white-space: pre;
+            line-height: 1.65;
+            tab-size: 4;
+        }
+
+        /* GDL syntax colors */
+        .gdl-kw  { color: #569cd6; font-weight: bold; }
+        .gdl-num { color: #b5cea8; }
+        .gdl-cmt { color: #6a9955; font-style: italic; }
+        /* ── AI Chat Panel ── */
+        .ai-chat-panel {
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--border-color);
+            background: var(--panel-bg);
+            overflow: hidden;
+        }
+        .ai-chat-header {
+            padding: 12px 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ai-model-badge {
+            font-size: 0.68rem;
+            background: rgba(94,129,172,0.2);
+            color: var(--accent-color);
+            padding: 2px 7px;
+            border-radius: 10px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .ai-msg {
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            max-width: 100%;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .ai-msg.user {
+            background: rgba(94,129,172,0.18);
+            color: var(--text-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-msg.assistant {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .ai-msg.error {
+            background: rgba(191,97,106,0.15);
+            color: #bf616a;
+        }
+        .ai-msg.thinking {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .ai-msg code, .ai-msg pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.78rem;
+            background: rgba(0,0,0,0.25);
+            border-radius: 4px;
+            padding: 2px 5px;
+        }
+        .ai-msg pre {
+            padding: 8px 10px;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .ai-insert-btn {
+            margin-top: 6px;
+            font-size: 0.72rem;
+            background: rgba(94,129,172,0.2);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 3px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .ai-insert-btn:hover { background: rgba(94,129,172,0.35); }
+        .ai-input-area {
+            border-top: 1px solid var(--border-color);
+            padding: 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .ai-context-row {
+            display: flex;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            align-items: center;
+        }
+        .ai-context-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .ai-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+            resize: none;
+            min-height: 70px;
+            font-family: inherit;
+        }
+        .ai-textarea:focus { outline: none; border-color: var(--accent-color); }
+        .ai-send-row {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ai-send-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ai-send-btn:hover { opacity: 0.85; }
+        .ai-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .ai-clear-btn {
+            font-size: 0.75rem;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .ai-clear-btn:hover { border-color: var(--text-muted); color: var(--text-color); }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <span class="logo">GDL Workbench</span>
+                <span class="project-info" id="headerProjectName">Projekt: -</span>
+                <span class="object-info" id="headerObjectName">Objekt: -</span>
+            </div>
+            <div class="header-right">
+                <div class="lang-switcher">
+                    <select>
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN NAVIGATION -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-button">Projektverwaltung</a>
+            <a href="object-selection.html" class="nav-button">Objektverwaltung</a>
+            <a href="param-management.html" class="nav-button">Parameterverwaltung</a>
+            <a href="index.html" class="nav-button">UI Designer</a>
+            <a href="script-editor.html" class="nav-button">Script Editor</a>
+            <a href="codeschmiede.html" class="nav-button active">Codeschmiede</a>
+            <a href="build-tasks.html" class="nav-button">Build Tasks</a>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="codeschmiede-container">
+
+            <!-- LEFT: Command Tree + Globals -->
+            <aside class="cmd-tree-panel">
+                <h3><i class="fas fa-sitemap"></i>&nbsp; GDL Befehle</h3>
+
+                <!-- Search -->
+                <div class="tree-search-wrap">
+                    <input type="text" id="treeSearch" class="tree-search"
+                           placeholder="Befehl suchen …" autocomplete="off">
+                    <i class="fas fa-search tree-search-icon"></i>
+                </div>
+
+                <!-- Scrollable command tree -->
+                <div id="commandTree">
+                    <div class="tree-no-results" id="treeNoResults">
+                        <i class="fas fa-search" style="font-size:1.4rem;margin-bottom:6px;display:block"></i>
+                        Keine Befehle gefunden
+                    </div>
+                </div>
+
+                <!-- Globals panel – pinned to bottom -->
+                <div class="globals-panel">
+                    <div class="globals-header" id="globalsToggle">
+                        <i class="fas fa-sliders-h"></i> Globale Festlegungen
+                        <i class="fas fa-chevron-down g-arrow" id="globalsArrow"></i>
+                    </div>
+                    <div class="globals-body" id="globalsBody">
+                        <div class="global-row">
+                            <label title="Name der Vergleichsvariable (z.B. für Epsilon-Tests)">
+                                Vergleichsvariable
+                            </label>
+                            <input id="globalEps" class="global-input" type="text"
+                                   placeholder="eps" title="Standard: eps">
+                        </div>
+                        <div class="global-row">
+                            <label title="Hotspot-ID Zähler – wird als Standard in HOTSPOT2-Befehlen verwendet">
+                                Hotspot-ID Zähler
+                            </label>
+                            <input id="globalUnID" class="global-input" type="text"
+                                   placeholder="unID" title="Standard: unID">
+                        </div>
+                        <div class="global-row">
+                            <label title="Schleifenzähler für Hauptskript (kommagetrennt)">
+                                Schleifenzähler
+                            </label>
+                            <input id="globalLoopMain" class="global-input" type="text"
+                                   placeholder="i, j, k" title="Standard: i, j, k">
+                        </div>
+                        <div class="global-row">
+                            <label title="Schleifenzähler für Subroutinen (kommagetrennt)">
+                                – Subroutinen
+                            </label>
+                            <input id="globalLoopSub" class="global-input" type="text"
+                                   placeholder="ii, jj, kk" title="Standard: ii, jj, kk">
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT: Workspace -->
+            <section class="cmd-workspace">
+
+                <!-- Params Panel (top) -->
+                <div class="cmd-params-panel">
+                    <!-- Placeholder -->
+                    <div class="cmd-placeholder" id="cmdPlaceholder">
+                        <i class="fas fa-hammer"></i>
+                        <p>Wähle links einen GDL-Befehl,<br>um die Eingabemaske zu öffnen.</p>
+                    </div>
+                    <!-- Active command -->
+                    <div id="cmdContent" class="hidden">
+                        <div class="cmd-header">
+                            <h2 id="cmdTitle">-</h2>
+                            <div class="cmd-path" id="cmdPath">-</div>
+                            <p class="cmd-description" id="cmdDescription">-</p>
+                        </div>
+
+                        <!-- Mode selector -->
+                        <div class="mode-selector" id="modeSelector">
+                            <button class="mode-btn active" data-mode="manual" title="Variablennamen manuell eingeben">
+                                <i class="fas fa-keyboard"></i> Manuell
+                            </button>
+                            <button class="mode-btn" data-mode="params" title="Variablennamen aus vorhandenen Parametern wählen">
+                                <i class="fas fa-list"></i> Aus Parametern
+                            </button>
+                            <button class="mode-btn" data-mode="declare" title="Variablen deklarieren und danach als neue Parameter anlegen">
+                                <i class="fas fa-arrow-right"></i> → Parameter
+                            </button>
+                        </div>
+
+                        <div class="cmd-form" id="cmdForm"></div>
+
+                        <div class="generate-row">
+                            <span class="live-badge">
+                                <span class="live-dot"></span> Live-Vorschau
+                            </span>
+                            <button id="saveSnippetBtn" class="snippet-btn" title="Aktuelle Parameter als wiederverwendbares Snippet speichern">
+                                <i class="fas fa-bookmark"></i> Snippet speichern
+                            </button>
+                            <button id="clearBtn" class="clear-btn" title="Auswahl zurücksetzen">
+                                <i class="fas fa-times"></i> Zurücksetzen
+                            </button>
+                        </div>
+
+                        <!-- Declare → Parameter action (mode c only) -->
+                        <div class="declare-actions hidden" id="declareActions">
+                            <span class="note">
+                                Variablen prüfen und als neue Parameter am Ende der Liste anlegen.
+                                Bereits vorhandene Parameter werden übersprungen.
+                            </span>
+                            <button id="saveAsParamsBtn" class="action-btn primary" style="white-space:nowrap">
+                                <i class="fas fa-save"></i> Variablen als Parameter speichern
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Preview (bottom) -->
+                <div class="cmd-preview-panel">
+                    <div class="preview-header">
+                        <span><i class="fas fa-eye"></i>&nbsp; Code-Vorschau</span>
+                        <button class="preview-btn" id="copyCodeBtn">
+                            <i class="fas fa-copy"></i> Kopieren
+                        </button>
+                        <button class="preview-btn primary" id="insertCodeBtn">
+                            <i class="fas fa-arrow-right"></i> In Script Editor einfügen
+                        </button>
+                    </div>
+                    <pre id="codePreview"><span style="color:#555;font-style:italic">! Wähle einen Befehl und fülle die Felder aus – der Code erscheint hier.</span></pre>
+                </div>
+
+            </section>
+
+            <!-- RIGHT: KI-Assistent -->
+            <aside class="ai-chat-panel">
+                <div class="ai-chat-header">
+                    <span><i class="fas fa-robot"></i>&nbsp; KI-Assistent</span>
+                    <select id="aiModelSelect" style="font-size:0.72rem;background:rgba(94,129,172,0.15);color:var(--accent-color);border:1px solid var(--accent-color);border-radius:8px;padding:2px 6px;cursor:pointer;">
+                        <option value="claude-3-haiku-20240307">Haiku 3 (verfügbar)</option>
+                        <option value="claude-3-5-haiku-20241022" disabled>Haiku 3.5 (mehr Guthaben nötig)</option>
+                        <option value="claude-3-5-sonnet-20241022" disabled>Sonnet 3.5 ★ (mehr Guthaben nötig)</option>
+                        <option value="claude-3-opus-20240229" disabled>Opus 3 (mehr Guthaben nötig)</option>
+                    </select>
+                </div>
+
+                <div class="ai-messages" id="aiMessages">
+                    <div class="ai-msg assistant">Hallo! Ich helfe Dir beim GDL-Programmieren. Stelle mir eine Frage oder beschreibe was Du bauen möchtest.</div>
+                </div>
+
+                <div class="ai-input-area">
+                    <div class="ai-context-row">
+                        <span>Kontext mitsenden:</span>
+                        <label><input type="checkbox" id="aiCtxScripts" checked> Skripte</label>
+                        <label><input type="checkbox" id="aiCtxParams"> Parameter</label>
+                    </div>
+                    <textarea class="ai-textarea" id="aiInput"
+                        placeholder="GDL-Frage oder Aufgabe beschreiben…&#10;&#10;Shift+Enter für neue Zeile, Enter zum Senden"
+                        rows="3"></textarea>
+                    <div class="ai-send-row">
+                        <button class="ai-clear-btn" id="aiClearBtn">
+                            <i class="fas fa-trash-alt"></i> Verlauf löschen
+                        </button>
+                        <button class="ai-send-btn" id="aiSendBtn">
+                            <i class="fas fa-paper-plane"></i> Senden
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <div class="footer-status" id="statusMessage">Status: Bereit</div>
+        </footer>
+    </div>
+
+    <script src="codeschmiede.js?v=20260223"></script>
+</body>
+
+</html>
