@@ -6,7 +6,6 @@ use App\Controllers\ParameterController;
 use App\Controllers\ProjectController;
 use App\Controllers\GdlObjectController;
 use App\Controllers\CodeschmiedeController;
-use App\Controllers\AiController;
 
 return function (App $app) {
 	$app->get('/', function (Request $request, Response $response) {
@@ -81,10 +80,6 @@ return function (App $app) {
 			$local->get('/snippets', CodeschmiedeController::class . ':getSnippets');
 			$local->post('/snippets', CodeschmiedeController::class . ':createSnippet');
 			$local->delete('/snippets/{id}', CodeschmiedeController::class . ':deleteSnippet');
-
-			// KI-Endpunkte
-			$local->post('/ai/chat', AiController::class . ':chat');
-			$local->post('/ai/generate', AiController::class . ':generate');
 
 			$local->get('/images/makros', \App\Controllers\LocalController::class . ':listMakrosImages');
 			$local->get('/images/makros/serve', \App\Controllers\LocalController::class . ':serveMakrosImage');
