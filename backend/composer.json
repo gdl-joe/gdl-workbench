@@ -5,8 +5,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Jochen Sühlo",
-            "email": "25@b-prisma.de"
+            "name": "GDL Workbench"
         }
     ],
     "require": {

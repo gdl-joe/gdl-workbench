@@ -347,8 +347,8 @@ class LocalImportService
             '4-3D-Script.gdl' => 'script_3d',
             '5-Interface-Script.gdl' => 'script_ui',
             '6-Properties-Script.gdl' => 'script_properties',
-            '7-Forward-Migration-Script.gdl' => 'script_forward_migration',
-            '8-Backward-Migration-Script.gdl' => 'script_backward_migration'
+            '7-Forward-Migration-Script.gdl' => 'script_migration_forward',
+            '8-Backward-Migration-Script.gdl' => 'script_migration_backward'
         ];
 
         foreach ($scriptFiles as $filename => $columnName) {

@@ -30,3 +30,11 @@ Thumbs.db
 
 # Embedded repos / Reste
 zz_reste/gdl-ui-studio_b/
+
+# KI-Chat-Exporte (können private Inhalte enthalten)
+**/ai/*_typingmind_chats.json
+zz_reste/ai/
+ai/
+
+# Lokale DB-Dateien
+*.db

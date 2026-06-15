@@ -15,8 +15,10 @@ return function (ContainerBuilder $containerBuilder) {
 		'db.user' => $_ENV['DB_USER'] ?? 'root',
 		'db.password' => $_ENV['DB_PASSWORD'] ?? '',
 
-		// Local Workspace Root
-		'local.workspace.root' => '/Users/Jochen/Documents/1_GDL_DEVELOP',
+		// Local Workspace Root – Verzeichnis mit den *.project-Ordnern.
+		// MUSS pro Rechner in backend/.env via LOCAL_WORKSPACE_ROOT gesetzt werden
+		// (siehe backend/.env.example). Ohne Wert bleibt die Projektliste leer.
+		'local.workspace.root' => $_ENV['LOCAL_WORKSPACE_ROOT'] ?? '',
 
 		// ###############################################################
 		// ANPASSUNG: Die PDO-Instanz direkt hier als Factory-Closure definieren

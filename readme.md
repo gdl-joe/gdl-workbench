@@ -75,27 +75,33 @@ Project (Bürogebäude_2024)
    composer install
    ```
 
-2. **Datenbank konfigurieren:**
-   
-   Datei `backend/.env` bearbeiten:
-   ```env
-   DB_HOST=localhost
-   DB_NAME=gdl_ui_studio_db
-   DB_USER=root
-   DB_PASSWORD=root
+2. **Konfiguration anlegen:**
+
+   `backend/.env.example` nach `backend/.env` kopieren und anpassen:
+   ```bash
+   cp backend/.env.example backend/.env
    ```
+   ```env
+   DB_HOST=127.0.0.1
+   DB_PORT=3306          # Herd nutzt z. B. 3307 – mit `lsof -iTCP -sTCP:LISTEN | grep mysqld` prüfen
+   DB_NAME=gdl-workbench
+   DB_USER=root
+   DB_PASSWORD=
+
+   # Pflicht: Verzeichnis mit deinen *.project-Ordnern (sonst bleibt die Projektliste leer)
+   LOCAL_WORKSPACE_ROOT=/pfad/zu/deinen/GDL-Projekten
+   ```
+   `backend/.env` ist in `.gitignore` – deine Pfade/Zugangsdaten landen nicht im Repo.
 
 3. **Datenbank erstellen:**
    ```bash
-   mysql -u root -p < database/install_UPDATED.sql
+   mysql -h127.0.0.1 -P<port> -u root -p < database/install.sql
    ```
-   
-   ⚠️ **WICHTIG:** Verwende `install_UPDATED.sql`, nicht `install.sql`!
+   Legt die DB `gdl-workbench` mit dem vollständigen Schema an.
 
-4. **Anwendung öffnen:**
-   ```
-   http://localhost:8888/gdl-ui-studio/public/param-management.html
-   ```
+4. **Server + Anwendung:**
+   - Mit Laravel Herd/Valet: Projekt verlinken → `https://gdl-workbench.test/dashboard.html`
+   - Oder Dev-Server: `cd backend && php -S localhost:8080 -t public`, Frontend separat aus `public/` ausliefern.
 
 ---
 
