@@ -2,6 +2,7 @@
 .env
 backend/.env
 **/.env
+backend/settings.json
 
 # Backups
 *.backup

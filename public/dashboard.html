@@ -376,6 +376,61 @@
             color: #d8dee9;
             font-size: 14px;
         }
+
+        /* Workspace-Panel */
+        .workspace-bar {
+            background: #2e3440;
+            border: 1px solid #4c566a;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+            color: #8899a6;
+        }
+        .workspace-bar .ws-label {
+            white-space: nowrap;
+            color: #8899a6;
+        }
+        .workspace-bar .ws-path {
+            flex: 1;
+            color: #d8dee9;
+            font-family: monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .workspace-bar .ws-path.empty {
+            color: #bf616a;
+            font-style: italic;
+            font-family: inherit;
+        }
+        .workspace-bar input[type="text"] {
+            flex: 1;
+            background: #3b4252;
+            border: 1px solid #5e81ac;
+            border-radius: 5px;
+            color: #d8dee9;
+            padding: 5px 10px;
+            font-size: 0.95em;
+            font-family: monospace;
+        }
+        .workspace-bar input[type="text"]:focus { outline: none; border-color: #88c0d0; }
+        .ws-btn {
+            background: #4c566a;
+            border: none;
+            border-radius: 5px;
+            color: #d8dee9;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        .ws-btn:hover { background: #5e81ac; }
+        .ws-btn.primary { background: #5e81ac; }
+        .ws-btn.primary:hover { background: #81a1c1; }
     </style>
 </head>
 
@@ -410,6 +465,19 @@
     </nav>
 
     <div class="container">
+
+        <!-- Workspace-Verzeichnis -->
+        <div class="workspace-bar" id="workspaceBar">
+            <span class="ws-label">📁 Workspace:</span>
+            <span class="ws-path" id="wsPathDisplay">Wird geladen …</span>
+            <button class="ws-btn" onclick="wsStartEdit()">Ändern</button>
+        </div>
+        <div class="workspace-bar" id="workspaceEdit" style="display:none;">
+            <span class="ws-label">📁 Pfad:</span>
+            <input type="text" id="wsPathInput" placeholder="/Pfad/zu/deinen/GDL-Projekten">
+            <button class="ws-btn primary" onclick="wsSave()">Speichern</button>
+            <button class="ws-btn" onclick="wsCancel()">Abbrechen</button>
+        </div>
 
         <div class="stats" id="stats">
             <div class="stat-item">
@@ -518,6 +586,62 @@
         let allProjects = [];
         let currentFilter = 'all';
 
+        // ── Workspace-Einstellung ──────────────────────────────────────
+        let currentWorkspacePath = '';
+
+        async function loadWorkspace() {
+            try {
+                const res = await fetch(`${API_BASE}/settings`);
+                const data = await res.json();
+                currentWorkspacePath = data.data?.workspace_root || '';
+                const display = document.getElementById('wsPathDisplay');
+                if (currentWorkspacePath) {
+                    display.textContent = currentWorkspacePath;
+                    display.classList.remove('empty');
+                } else {
+                    display.textContent = 'Noch nicht konfiguriert – bitte Verzeichnis einstellen';
+                    display.classList.add('empty');
+                }
+            } catch (e) {
+                document.getElementById('wsPathDisplay').textContent = 'Fehler beim Laden';
+            }
+        }
+
+        function wsStartEdit() {
+            document.getElementById('wsPathInput').value = currentWorkspacePath;
+            document.getElementById('workspaceBar').style.display = 'none';
+            document.getElementById('workspaceEdit').style.display = 'flex';
+            document.getElementById('wsPathInput').focus();
+        }
+
+        function wsCancel() {
+            document.getElementById('workspaceEdit').style.display = 'none';
+            document.getElementById('workspaceBar').style.display = 'flex';
+        }
+
+        async function wsSave() {
+            const val = document.getElementById('wsPathInput').value.trim();
+            if (!val) return;
+            try {
+                const res = await fetch(`${API_BASE}/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ workspace_root: val })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    wsCancel();
+                    await loadWorkspace();
+                    await loadProjects();
+                } else {
+                    alert('Fehler: ' + (data.message || 'Unbekannt'));
+                }
+            } catch (e) {
+                alert('Netzwerkfehler: ' + e.message);
+            }
+        }
+        // ──────────────────────────────────────────────────────────────
+
         // Load projects on page load
         window.addEventListener('DOMContentLoaded', () => {
             // UI-Designer-Link mit objectId versehen (gleiches Objekt in allen Browsern)
@@ -526,6 +650,7 @@
                 const oid = localStorage.getItem('currentGdlObjectId');
                 uiDesignerLink.href = oid ? `index.html?objectId=${encodeURIComponent(oid)}` : 'index.html';
             }
+            loadWorkspace();
             loadProjects();
         });
 

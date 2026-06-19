@@ -1,261 +1,170 @@
-# GDL-UI-Studio
+# GDL Workbench
 
-Webbasierte Anwendung zur Verwaltung und zum Design von Benutzeroberflächen für GDL (Geometric Description Language) Objekte in ArchiCAD.
+Webbasierte Entwicklungsumgebung für GDL (Geometric Description Language) Objekte in ArchiCAD.
 
-![Version](https://img.shields.io/badge/version-0.9-blue)
-![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-purple)
+![Version](https://img.shields.io/badge/version-1.6.0-blue)
+![PHP](https://img.shields.io/badge/PHP-%3E%3D8.0-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## 🎯 Features
+## Features
 
-- ✅ **Projekt- und Objektverwaltung** - 3-stufige Hierarchie (Projekt → GDL-Objekt → Parameter)
-- ✅ **XML Import/Export** - Direkte Integration mit ArchiCAD
-- ✅ **Parameterverwaltung** - Vollständige CRUD-Operationen
-- ✅ **Mehrsprachigkeit** - DE, EN, FR, ES, IT
-- ✅ **Inline-Editing** - Direkte Bearbeitung in der Tabelle
-- ✅ **Drag & Drop** - Intuitive Sortierung
-- 🔄 **UI Designer** - Visueller Editor (in Planung)
+### Projektverwaltung
+- Liest lokale GDL-Projekte direkt aus dem Dateisystem (`.project`-Ordner)
+- Status-Verwaltung: Aktiv / In Arbeit / Dringend / Archiv
+- Suche, Sortierung und Filterung
+- Workspace-Verzeichnis direkt in der App konfigurierbar
 
----
+### Objektverwaltung
+- Alle GDL-Objekte eines Projekts auf einen Blick
+- Import und Export von GDL-Objekten (`.gsm`)
+- Synchronisation mit lokalen Dateien
 
-## 📁 Projektstruktur
+### Parameterverwaltung
+- Import aus ArchiCAD XML-Export
+- Vollständige CRUD-Operationen (Erstellen, Bearbeiten, Löschen)
+- Drag & Drop Sortierung
+- Inline-Editing direkt in der Tabelle
+- Mehrsprachige Beschriftungen (DE, EN, FR, ES)
+- Farbcodierung nach Parametertypen
+- Array-Parameter-Editor
 
-```
-gdl-ui-studio/
-├── backend/                     # PHP Backend (Slim Framework)
-│   ├── config/                 # Konfiguration
-│   ├── public/index.php        # API Entry Point
-│   ├── src/Controllers/        # REST Controller
-│   └── .env                    # DB Credentials
-├── database/
-│   ├── install.sql             # ⚠️ VERALTET
-│   └── install_UPDATED.sql     # ✅ AKTUELL
-├── public/
-│   ├── index.html              # UI Designer (Mockup)
-│   ├── param-management.html   # Parameterverwaltung
-│   └── style.css               # Nord Theme
-└── ai/                         # KI-Entwicklungshistorie
-```
+### Skript Editor
+- Monaco Editor (VS Code Engine) für alle 6 GDL-Skripttypen:  
+  Master, 2D, 3D, UI, Parameter, Properties
+- GDL-spezifisches Syntax Highlighting
+- Direkte Bearbeitung der `Parameters.xml`
+- Export der Skripte in lokale Dateien
 
----
+### UI Designer
+- Visueller Editor für GDL-Benutzeroberflächen
+- Echtzeit-Vorschau
+- Template-Bibliothek (b-prisma Standard, Graphisoft Standard Navigation)
 
-## 🗄️ Datenbank-Schema
+### Codeschmiede
+- Interaktiver GDL-Code-Generator aus Eingabemasken
+- Drei Modi: Manuell / Aus Parametern / → Parameter
+- Befehlsbaum mit Live-Suche (alle 2D/3D GDL-Befehle)
+- Snippet-Speicherung in der Datenbank
+- Code direkt in den Skript Editor übertragen
 
-### Hierarchie:
-```
-Project (Bürogebäude_2024)
-  └─ GDL Object (Fenster_Standard.gsm)
-      └─ Parameter (A, B, iWindowType)
-          └─ Translations (DE, EN, FR, ES, IT)
-```
+### Build Tasks
+- Automatisierbare Build-Prozesse für GDL-Objekte
 
-### Tabellen:
-1. `projects` - Hauptprojekte
-2. `gdl_objects` - GDL-Objekte pro Projekt **(NEU!)**
-3. `parameters` - Parameter pro Objekt (verwendet `gdl_object_id`)
-4. `parameter_translations` - Mehrsprachige Übersetzungen
+### Mehrsprachigkeit
+- Interface in Deutsch, Englisch, Französisch und Spanisch
 
 ---
 
-## 🚀 Installation
+## Tech Stack
 
-### Voraussetzungen:
-- PHP >= 7.4
-- MySQL/MariaDB >= 5.7
+**Backend:** PHP 8+ · Slim Framework 4 · PHP-DI · MySQL/MariaDB  
+**Frontend:** Vanilla JS (ES6+) · Monaco Editor · Font Awesome 6  
+**Lokalbetrieb:** Laravel Herd / Valet / MAMP
+
+---
+
+## Installation
+
+### Voraussetzungen
+- PHP >= 8.0
+- MySQL/MariaDB
 - Composer
-- Webserver (MAMP/XAMPP)
+- Laravel Herd, Valet oder MAMP
 
-### Setup-Schritte:
+### Setup
 
-1. **Backend Dependencies installieren:**
+1. **Backend-Dependencies installieren:**
    ```bash
    cd backend
    composer install
    ```
 
 2. **Konfiguration anlegen:**
-
-   `backend/.env.example` nach `backend/.env` kopieren und anpassen:
    ```bash
    cp backend/.env.example backend/.env
    ```
+   `backend/.env` bearbeiten:
    ```env
    DB_HOST=127.0.0.1
-   DB_PORT=3306          # Herd nutzt z. B. 3307 – mit `lsof -iTCP -sTCP:LISTEN | grep mysqld` prüfen
-   DB_NAME=gdl-workbench
+   DB_PORT=3306        # Herd: typischerweise 3307
+   DB_NAME=gdl_ui_studio_db
    DB_USER=root
-   DB_PASSWORD=
+   DB_PASSWORD=dein_passwort
 
-   # Pflicht: Verzeichnis mit deinen *.project-Ordnern (sonst bleibt die Projektliste leer)
+   # Verzeichnis mit deinen *.project-Ordnern
    LOCAL_WORKSPACE_ROOT=/pfad/zu/deinen/GDL-Projekten
    ```
-   `backend/.env` ist in `.gitignore` – deine Pfade/Zugangsdaten landen nicht im Repo.
+   > Das Workspace-Verzeichnis kann alternativ direkt in der App unter **Projektverwaltung** eingestellt werden.
 
 3. **Datenbank erstellen:**
    ```bash
-   mysql -h127.0.0.1 -P<port> -u root -p < database/install.sql
+   mysql -h 127.0.0.1 -P 3306 -u root -p < database/install.sql
    ```
-   Legt die DB `gdl-workbench` mit dem vollständigen Schema an.
 
-4. **Server + Anwendung:**
-   - Mit Laravel Herd/Valet: Projekt verlinken → `https://gdl-workbench.test/dashboard.html`
-   - Oder Dev-Server: `cd backend && php -S localhost:8080 -t public`, Frontend separat aus `public/` ausliefern.
-
----
-
-## 📖 Verwendung
-
-### Workflow:
-
-1. **Projekt erstellen**
-   - Klicke "+ Button" neben Projekt-Dropdown
-   - Name eingeben: z.B. "Bürogebäude_2024"
-
-2. **GDL-Objekt erstellen**
-   - Klicke "+ Button" neben Objekt-Dropdown
-   - Name eingeben: z.B. "Fenster_Standard.gsm"
-
-3. **XML Import**
-   - "XML Parameter Import" Button klicken
-   - XML-Datei auswählen (aus ArchiCAD exportiert)
-   - Parameter werden automatisch importiert
-
-4. **Parameter bearbeiten**
-   - **Tabelle:** Direkt in Zellen klicken
-   - **Rechtes Panel:** Detaillierte Bearbeitung
-   - **Mehrsprachigkeit:** Tabs verwenden (DE, EN, FR, ES, IT)
-   - **Sortieren:** Drag & Drop in der Tabelle
-
-5. **XML Export**
-   - "Parameter Export (XML)" Button
-   - XML-Datei wird heruntergeladen
-   - Zurück in ArchiCAD importieren
+4. **Server starten:**
+   - **Herd/Valet:** Projekt verlinken → `https://gdl-workbench.test/dashboard.html`
+   - **PHP Dev-Server:** `cd backend && php -S localhost:8080 -t public`
 
 ---
 
-## 🔌 API Endpoints
+## Projektstruktur
 
-### Base URL:
 ```
-http://localhost:8888/gdl-ui-studio/backend/public/api
-```
-
-### Projects:
-- `GET /api/projects` - Alle Projekte abrufen
-- `POST /api/projects` - Projekt erstellen `{"name": "..."}`
-- `PUT /api/projects/{id}` - Projekt aktualisieren
-- `DELETE /api/projects/{id}` - Projekt löschen
-
-### GDL Objects:
-- `GET /api/projects/{projectId}/objects` - Objekte eines Projekts
-- `POST /api/objects` - Objekt erstellen `{"project_id": 1, "name": "..."}`
-- `PUT /api/objects/{id}` - Objekt aktualisieren
-- `DELETE /api/objects/{id}` - Objekt löschen
-
-### Parameters:
-- `POST /api/parameters/import` - XML Import
-- `GET /api/objects/{objectId}/parameters` - Parameter abrufen
-- `POST /api/parameters/create` - Parameter erstellen
-- `PUT /api/parameters/{id}` - Parameter aktualisieren
-- `DELETE /api/parameters/{id}` - Parameter löschen
-- `POST /api/parameters/bulk-delete` - Mehrere löschen
-- `POST /api/parameters/reorder` - Sortierung ändern
-- `GET /api/objects/{objectId}/parameters/export` - XML Export
-
----
-
-## 🎨 Tech Stack
-
-### Backend:
-- PHP 7.4+ mit Slim Framework 4.0
-- PHP-DI 6.0 (Dependency Injection)
-- MySQL/MariaDB
-
-### Frontend:
-- HTML5/CSS3 (Nord Theme)
-- Vanilla JavaScript (ES6+)
-- Font Awesome 6.0
-- Fetch API
-
----
-
-## 🐛 Bekannte Probleme
-
-### ⚠️ KRITISCH:
-- **`database/install.sql` ist veraltet!** 
-  → Fehlt `gdl_objects` Tabelle
-  → Verwende stattdessen `install_UPDATED.sql`
-
-### 🔄 In Arbeit:
-- UI Designer ist nur Mockup (nicht funktional)
-- CSV Import noch nicht implementiert
-- Dictionary/Array Export unvollständig
-- Vue.js Frontend (frontend-src/) ist leer
-
----
-
-## 📚 Weitere Dokumentation
-
-Detaillierte Dokumentation:
-- **Vollständige Übersicht:** `~/GDL_UI_Studio_Projekt_Uebersicht.md`
-- **GDL-Referenz:** [ArchiCAD GDL Documentation](https://gdl.graphisoft.com/)
-- **Slim Framework:** [Slim 4 Docs](https://www.slimframework.com/docs/v4/)
-
----
-
-## 🔧 Development
-
-### Backend Dev-Server starten:
-```bash
-cd backend
-php -S 0.0.0.0:8080 -t public
-```
-
-### Datenbank-Backup:
-```bash
-mysqldump -u root -p gdl_ui_studio_db > backup_$(date +%Y%m%d).sql
-```
-
-### Logs anzeigen:
-```bash
-tail -f storage/logs/app.log
+gdl-workbench/
+├── backend/
+│   ├── config/             # Slim-Konfiguration, DI-Container
+│   ├── public/index.php    # API Entry Point
+│   ├── src/
+│   │   ├── Controllers/    # REST Controller
+│   │   ├── Services/       # Business Logic
+│   │   └── Helpers/
+│   └── .env                # Lokale Konfiguration (nicht im Repo)
+├── database/
+│   └── install.sql         # Vollständiges Datenbankschema
+├── knowledge/              # GDL-Referenz für die Codeschmiede
+└── public/
+    ├── dashboard.html      # Projektverwaltung
+    ├── object-selection.html
+    ├── param-management.html
+    ├── script-editor.html
+    ├── index.html          # UI Designer
+    ├── codeschmiede.html
+    └── build-tasks.html
 ```
 
 ---
 
-## 📝 Changelog
+## Workflow
 
-### Version 0.9 (Dezember 2024) - Aktuell
-- ✅ 3-stufige Hierarchie implementiert
-- ✅ Vollständige REST API
-- ✅ XML Import/Export funktionsfähig
-- ✅ Inline-Editing & Drag & Drop
-- ✅ Mehrsprachigkeit (5 Sprachen)
-- ✅ Auto-Save mit 500ms Debouncing
-- ✅ Datenbank-Schema korrigiert
-
-### Geplant v1.0:
-- 🔄 UI Designer vollständig funktional
-- 🔄 CSV Import implementieren
-- 🔄 Benutzer-Authentifizierung
-- 🔄 Vue.js Frontend Migration
+1. **Projektverwaltung** öffnen → Workspace-Verzeichnis einmalig einstellen
+2. GDL-Projekte werden automatisch aus dem Dateisystem gelesen
+3. Objekt auswählen → Parameter aus `Parameters.xml` importieren
+4. Parameter bearbeiten, Skripte anpassen
+5. Skripte exportieren → zurück in ArchiCAD
 
 ---
 
-## 👤 Autor
+## API (Auszug)
 
-**Jochen Sühlo**  
-E-Mail: 25@b-prisma.de  
+Basis-URL: `../backend/public/api/local`
+
+| Methode | Endpunkt | Beschreibung |
+|---------|----------|--------------|
+| GET | `/projects` | Alle lokalen Projekte |
+| GET | `/objects` | Objekte eines Projekts |
+| GET | `/objects/{id}/parameters` | Parameter eines Objekts |
+| POST | `/parameters/import` | XML-Import |
+| GET | `/objects/{id}/parameters/export` | XML-Export |
+| POST | `/objects/{id}/update-scripts` | Skripte in Dateien schreiben |
+| GET | `/snippets` | Codeschmiede-Snippets |
+| GET | `/settings` | Workspace-Einstellungen lesen |
+| POST | `/settings` | Workspace-Einstellungen speichern |
+
+---
+
+## Autor
+
+**Jochen Sühlo** · b-prisma · [b-prisma.de](https://b-prisma.de)  
 Lizenz: MIT
-
----
-
-## 📄 Lizenz
-
-MIT License - siehe LICENSE Datei für Details.
-
----
-
-**Viel Erfolg mit GDL-UI-Studio! 🚀**

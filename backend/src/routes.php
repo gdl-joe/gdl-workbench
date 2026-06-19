@@ -6,6 +6,7 @@ use App\Controllers\ParameterController;
 use App\Controllers\ProjectController;
 use App\Controllers\GdlObjectController;
 use App\Controllers\CodeschmiedeController;
+use App\Controllers\SettingsController;
 
 return function (App $app) {
 	$app->get('/', function (Request $request, Response $response) {
@@ -75,6 +76,10 @@ return function (App $app) {
 			$local->post('/parameters/reorder', \App\Controllers\ParameterController::class . ':reorderParameters');
 			$local->put('/parameters/{parameterId}', \App\Controllers\ParameterController::class . ':updateParameter');
 			$local->delete('/parameters/{parameterId}', \App\Controllers\ParameterController::class . ':deleteParameter');
+
+			// Einstellungen (Workspace-Verzeichnis)
+			$local->get('/settings', SettingsController::class . ':getSettings');
+			$local->post('/settings', SettingsController::class . ':saveSettings');
 
 			// Codeschmiede Snippets
 			$local->get('/snippets', CodeschmiedeController::class . ':getSnippets');

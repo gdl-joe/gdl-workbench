@@ -15,10 +15,15 @@ return function (ContainerBuilder $containerBuilder) {
 		'db.user' => $_ENV['DB_USER'] ?? 'root',
 		'db.password' => $_ENV['DB_PASSWORD'] ?? '',
 
-		// Local Workspace Root – Verzeichnis mit den *.project-Ordnern.
-		// MUSS pro Rechner in backend/.env via LOCAL_WORKSPACE_ROOT gesetzt werden
-		// (siehe backend/.env.example). Ohne Wert bleibt die Projektliste leer.
-		'local.workspace.root' => $_ENV['LOCAL_WORKSPACE_ROOT'] ?? '',
+		// Local Workspace Root – settings.json hat Vorrang vor .env
+		'local.workspace.root' => (function() {
+			$settingsFile = __DIR__ . '/../settings.json';
+			if (file_exists($settingsFile)) {
+				$s = json_decode(file_get_contents($settingsFile), true);
+				if (!empty($s['workspace_root'])) return $s['workspace_root'];
+			}
+			return $_ENV['LOCAL_WORKSPACE_ROOT'] ?? '';
+		})(),
 
 		// ###############################################################
 		// ANPASSUNG: Die PDO-Instanz direkt hier als Factory-Closure definieren
