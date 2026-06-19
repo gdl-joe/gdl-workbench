@@ -10,7 +10,7 @@ use App\Controllers\SettingsController;
 
 return function (App $app) {
 	$app->get('/', function (Request $request, Response $response) {
-		$response->getBody()->write('Hello from GDL-UI-Studio Backend!');
+		$response->getBody()->write('GDL Workbench API');
 		return $response;
 	});
 

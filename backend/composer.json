@@ -1,6 +1,6 @@
 {
-    "name": "gdl-ui-studio/backend",
-    "description": "GDL-UI-Studio Backend API",
+    "name": "gdl-workbench/backend",
+    "description": "GDL Workbench Backend API",
     "type": "project",
     "license": "MIT",
     "authors": [
