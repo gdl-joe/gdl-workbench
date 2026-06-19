@@ -82,7 +82,7 @@ Project (Bürogebäude_2024)
    DB_HOST=localhost
    DB_NAME=gdl_ui_studio_db
    DB_USER=root
-   DB_PASSWORD=root
+   DB_PASSWORD=dein_passwort
    ```
 
 3. **Datenbank erstellen:**
