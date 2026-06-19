@@ -1,40 +1,45 @@
 # Projektstand — GDL Workbench
-Zuletzt aktualisiert: 2026-04-10 (Session 2)
+Zuletzt aktualisiert: 2026-06-20
 
-## Was ist dieses Projekt?
-Web-basiertes Verwaltungswerkzeug für GDL-Objekte und deren Parameter.
-PHP-Backend (Slim Framework) + Vanilla-JS-Frontend. Läuft lokal auf Herd/MAMP.
+## Was wurde gemacht
+
+### GitHub Repository
+- Neues öffentliches Repo angelegt: https://github.com/gdl-joe/gdl-workbench
+- `.env` aus der gesamten Git-History entfernt (`git filter-repo`)
+- `DB_PASSWORD=root` in Markdown-Doku durch Platzhalter ersetzt
+- `backend/settings.json` zu `.gitignore` hinzugefügt
+
+### Bugfixes
+- **Projektverwaltung leer:** MySQL-Port 3307 fehlte im DSN → `port=` in config.php ergänzt
+- **DB-Name falsch:** `.env` hatte `DB_NAME=gdl-workbench` statt `gdl_ui_studio_db` → korrigiert
+- **KI-Chat-Insert:** AI-Button setzte `generatedCode` nicht → "In Editor einfügen" funktioniert jetzt
+- **KI-Chat verschwindet bei Tab-Wechsel:** `aiHistory` wird jetzt in `localStorage` persistiert
+
+### KI-Funktionalität entfernt
+- `AiController.php` gelöscht
+- AI-Routes aus `routes.php` entfernt
+- KI-Assistent-Panel aus `codeschmiede.html` entfernt (CSS + HTML + JS)
+- Grid-Layout Codeschmiede: 3 → 2 Spalten
+
+### README neu geschrieben
+- Vollständig aktualisiert auf v1.6.0
+- Kein „GDL-Studio" oder „GDL-UI-Studio" mehr — überall „GDL Workbench"
+- Alle aktuellen Features dokumentiert (Codeschmiede, Script Editor, UI Designer, Build Tasks, Mehrsprachigkeit)
+- API-Tabelle, Projektstruktur, korrekter Workflow
+
+### Workspace-Verzeichnis im Dashboard (neues Feature)
+- Neues Panel ganz oben in der Projektverwaltung: zeigt aktuellen Workspace-Pfad
+- „Ändern"-Button → Inline-Eingabe → Speichern → Projektliste lädt automatisch neu
+- Backend: `SettingsController.php` + Routes `GET/POST /api/local/settings`
+- Pfad wird in `backend/settings.json` gespeichert (gitignored), hat Vorrang vor `.env`
 
 ## Aktueller Stand
-- Projekt liegt **auf Eis** — Jochen fokussiert sich auf RaumReport
-- Letzter aktiver Git-Commit: 2024-12-10 ("Spaltenreihenfolge, Farbcodierung, Array-Editor implementiert")
-- Backend: Slim-Framework mit REST-API vollständig aufgebaut
-- Frontend: Mehrere HTML-Seiten vorhanden (Dashboard, Objekt-Auswahl, Parameter-Verwaltung, Codeschmiede, Script-Editor, Build-Tasks, UI-Designer)
+- Alle 7 Seiten funktionieren: Projektverwaltung, Objektverwaltung, Parameterverwaltung, UI Designer, Script Editor, Codeschmiede, Build Tasks
+- GitHub aktuell (öffentlich, keine sensiblen Daten): https://github.com/gdl-joe/gdl-workbench
+- Lokale `.env`: `DB_NAME=gdl_ui_studio_db`, `DB_PORT=3307`, `LOCAL_WORKSPACE_ROOT=/Users/Jochen/Documents/1_GDL_DEVELOP`
 
-## Was wurde in dieser Session gemacht (2026-04-10)
-- Ausführliches Interview zur Person, Firma und Projekten durchgeführt
-- 4 Memory-Dateien in `gdl-workbench/memory/` angelegt (Profil, Business, Projekte, Feedback)
-- Globale `~/.claude/CLAUDE.md` um persönlichen Kontext-Block ergänzt
-- Regel für automatische `SESSION_STATUS.md` in globale CLAUDE.md aufgenommen
-- Diese Datei erstmalig angelegt
+## Nächste Schritte
+- (offen)
 
-## Was wurde zuletzt gemacht (Dez 2024)
-- Spaltenreihenfolge in der Parameter-Tabelle angepasst
-- Farbcodierung für Parameter-Typen implementiert
-- Array-Editor implementiert (teilweise)
-
-## API-Routen (Backend)
-- `/api/projects` — Projektverwaltung (CRUD)
-- `/api/gdl-objects` — GDL-Objekte (CRUD, Duplikat, ZIP-Export)
-- `/api/parameters` — Parameter (Import XML, CRUD, Reorder, Bulk-Delete, Export XML)
-- `/api/parameter-type-colors` — Farbkonfiguration pro Typ
-- Codeschmiede, AI-Controller ebenfalls vorhanden
-
-## Nächste Schritte (wenn Projekt wieder aufgenommen wird)
-- Array-Editor fertigstellen
-- Stand der Frontend-Seiten prüfen (einige haben `_online_version`-Varianten — Zusammenführung klären)
-- `.bak` und `.tmp` Dateien bereinigen (`ui-designer.js.bak`, `ui-designer.js.tmp`)
-
-## Offene Probleme / Bekannte Baustellen
-- Gestaged/gelöschte Dateien im Git-Status (viele MD-Dateien, Screenshots, JSON) — kein Commit seit Dez 2024
-- Projekt bewusst pausiert — keine offenen Bugs bekannt
+## Offene Probleme / Blockaden
+- Keine
