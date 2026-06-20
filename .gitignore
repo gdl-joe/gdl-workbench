@@ -32,8 +32,23 @@ Thumbs.db
 /tmp/
 *.tmp
 
-# Embedded repos / Reste
-zz_reste/gdl-ui-studio_b/
+# Interne Entwicklungsordner
+zz_reste/
+knowledge/
+
+# Interne Markdown-Dokumente (nur readme.md, Funktionen.md, QUICKSTART.md bleiben)
+Markdown/AGENTS.md
+Markdown/BUGFIX_*.md
+Markdown/CHANGELOG_*.md
+Markdown/FINAL_*.md
+Markdown/SESSION_*.md
+Markdown/UPDATE_*.md
+Markdown/OBJEKTE_*.md
+Markdown/Button-Analyse.md
+Markdown/GDL UI Studio.md
+Markdown/Technische Spezifikation*.md
+Markdown/Umfassender*.md
+Markdown/video_script_gdl_workbench.md
 
 # KI-Chat-Exporte (können private Inhalte enthalten)
 **/ai/*_typingmind_chats.json
