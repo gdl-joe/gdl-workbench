@@ -4,6 +4,18 @@ backend/.env
 **/.env
 backend/settings.json
 
+# Composer-Abhängigkeiten (per composer install erzeugen)
+backend/vendor/
+
+# Lokale Dev-Konfiguration
+herd.yml
+
+# Debug-Skripte
+public/debug_check.php
+
+# Kundenprojekt-Assets (nicht öffentlich)
+public/images/b-prisma-schachtbauwerke/
+
 # Lokale Session-Notizen (können private Pfade enthalten)
 SESSION_STATUS.md
 
