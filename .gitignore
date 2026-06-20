@@ -4,6 +4,9 @@ backend/.env
 **/.env
 backend/settings.json
 
+# Lokale Session-Notizen (können private Pfade enthalten)
+SESSION_STATUS.md
+
 # Backups
 *.backup
 *.backup*
